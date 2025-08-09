@@ -7,9 +7,7 @@
     ])
 
 
-<x-forms.field>
-
-    <x-forms.label :name="$name" :label="$label" />
+<x-forms.field :label="$label" :name="$name">
 
         <input 
             label="{{ $label }}"
@@ -17,7 +15,6 @@
             name="{{ $name }}" 
             class="{{ $class }}"
             placeholder="{{ $placeholder }}" />
-
     
 
 </x-forms.field>

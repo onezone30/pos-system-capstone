@@ -2,7 +2,7 @@
 
     <x-nav />
 
-    <main class="max-w-[668px] mx-auto px-6">
+    <main class="max-w-[668px] mx-auto px-6 pb-6">
 
         <div class="mt-14 p-6 bg-gray-800 rounded-lg">
 
