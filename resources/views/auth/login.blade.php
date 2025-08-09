@@ -2,9 +2,9 @@
 
     <x-nav />
 
-    <main class="max-w-[668px] mx-auto px-6">
+    <main class="mt-14 max-w-[668px] mx-auto px-6">
 
-        <div class="mt-14 p-6 bg-gray-800 rounded-lg">
+        <div class="p-6 bg-gray-800 rounded-lg">
 
             <h1 class="mb-8 font-bold text-4xl text-center">
                 Login

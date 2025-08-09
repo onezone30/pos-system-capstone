@@ -17,6 +17,7 @@
                     label="Name" 
                     placeholder="Enter your name"/>
 
+                    
                 <x-forms.input 
                     name="email" 
                     label="Email" 
