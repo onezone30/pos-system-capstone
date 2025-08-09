@@ -21,6 +21,7 @@
                         Home
                     </x-nav-link>
                 </li>
+                @guest
                 <li>
                     <x-nav-link href="/login">
                         Log In
@@ -31,6 +32,7 @@
                         Register
                     </x-nav-link>
                 </li>
+                @endguest
             </ul>
         </div>
     </div>
