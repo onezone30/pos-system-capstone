@@ -33,6 +33,13 @@
                     </x-nav-link>
                 </li>
                 @endguest
+                @auth
+                <li>
+                    <x-nav-link href="/logout">
+                        Log Out
+                    </x-nav-link>
+                </li>
+                @endauth
             </ul>
         </div>
     </div>
