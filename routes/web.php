@@ -1,5 +1,8 @@
 <?php
 
+use App\Http\Controllers\AdminController;
+use App\Http\Controllers\CashierController;
+use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\RegisterUserController;
 use Illuminate\Support\Facades\Auth;
@@ -16,25 +19,19 @@ Route::get('/register', [RegisterUserController::class, 'create']);
 Route::post('/register', [RegisterUserController::class, 'store']);
 Route::post('/login', [LoginController::class, 'store'])->name('login');
 
-
-Route::middleware(['auth', 'role:admin'])->group(function() {
-    
+Route::middleware(['auth', 'role:customer'])->prefix('customer')->group(function() {
+    Route::get('/dashboard', [CustomerController::class, 'index'])
+        ->name('customer.dashboard');
 });
 
-Route::middleware(['auth', 'role:customer'])->group(function() {
-        Route::get('/dashboard', function() {
-        return view('customer.dashboard', [
-            'user' => Auth::user()
-        ]   );
-        })->name('dashboard')->middleware(['auth']);
+Route::middleware(['auth', 'role:admin'])->prefix('admin')->group(function() {
+    Route::get('/dashboard', [AdminController::class, 'index'])
+        ->name('admin.dashboard');
 });
 
-Route::middleware(['auth', 'role:cashier'])->group(function() {
-    
+Route::middleware(['auth', 'role:cashier'])->prefix('cashier')->group(function() {
+    Route::get('/dashboard', [CashierController::class, 'index'])
+        ->name('cashier.dashboard');
 });
 
-Route::get('/logout', function() {
-    Auth::logout();
-
-    return view('login');
-});
+Route::get('/logout', [LoginController::class, 'destroy']);
