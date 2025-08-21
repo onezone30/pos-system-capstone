@@ -23,9 +23,9 @@ return new class extends Migration
         Schema::create('product_prices', function (Blueprint $table) {
             $table->id();
             $table->foreignIdFor(Product::class)->constrained()->cascadeOnDelete();
-            $table->string('size'); // Price 1, Price 2, Price 3
-            $table->decimal('price', 10, 2); 
-            $table->integer('quantity_stock');
+            $table->string('size')->nullable();
+            $table->decimal('price', 10, 2)->nullable(); 
+            $table->integer('quantity_stock')->nullable();
             $table->timestamps();
         });
     }

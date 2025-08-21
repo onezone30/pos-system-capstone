@@ -7,6 +7,7 @@ use App\Http\Requests\ProductRequest;
 use App\Models\Category;
 use App\Models\Product;
 use App\Models\ProductPrices;
+use App\Services\ProductServices;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -14,39 +15,26 @@ class ProductController extends Controller
 {
     public function index()
     {
+        $user = Auth::user();
+        $products = Product::with('prices')->get();
         $category = Category::all();
 
         return view('admin.products.index', [
-            'user' => Auth::user(),
-            'products' => Product::with('prices')->get(),
+            'user' => $user,
+            'products' => $products,
             'categories' => $category
         ]);
     }
-    public function store(ProductRequest $productRequest, PriceRequest $priceRequest)
-    {
+        public function store(ProductServices $productServices, ProductRequest $productRequest, PriceRequest $priceRequest) {
 
-        $product = Product::create([
-            'category_id' => $productRequest->category,
-            'name' => $productRequest->name
-        ]);
+        $product = $productServices->saveProduct(null, $productRequest, $priceRequest);
 
-        foreach(request()->size as $index => $size){
-            $price = ProductPrices::create([
-                'product_id' => $product->id,
-                'price' => $priceRequest->price[$index],
-                'quantity_stock' => $priceRequest->quantity_stock[$index],
-                'size' => $size
-            ]);
-        }
-
-        if(!$product && !$price) {
-            return back()->with([
-                'error' => 'Product error'
-            ]);
-        }
-
-
-        return redirect()->route('admin.dashboard');
+        return redirect()
+                ->route('admin.products')
+                ->with('toast', [
+                    'message' => "Product $product has been created",
+                    'type' => 'success'
+                ]);
     }
 
     public function destroy(Product $product)
@@ -56,27 +44,16 @@ class ProductController extends Controller
         return redirect()->route('admin.products');
     }
 
-    public function update(Product $product, ProductRequest $productRequest, PriceRequest $priceRequest)
+    public function update(ProductServices $productServices, Product $product, ProductRequest $productRequest, PriceRequest $priceRequest)
     {
-        $product->update([
-            'name' => $productRequest->name, 
-        ]);
+        $productServices->saveProduct($product, $productRequest, $priceRequest);
 
-        foreach(request()->size as $index => $size){
-            $product->update([
-                'price' => $priceRequest->price[$index],
-                'quantity_stock' => $priceRequest->quantity_stock[$index],
-                'size' => $size
+        return redirect()
+            ->route('admin.products')
+            ->with('toast', [
+                'message' => "Product $product has been created",
+                'type' => 'success'
             ]);
-        }
-
-        if(!$product) {
-            return back()->with([
-                'error' => 'Product error'
-            ]);
-        }
-
-        return redirect()->route('admin.dashboard');
 
     }
 }
