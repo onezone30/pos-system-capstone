@@ -3,6 +3,8 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
+use Illuminate\Validation\Rules\Password;
 
 class UserRequest extends FormRequest
 {
@@ -22,9 +24,17 @@ class UserRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => ['required'],
-            'email' => ['required', 'email', 'unique:users,email'],
-            'password' => ['required', 'confirmed'],
+            'name' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'email', Rule::unique('users', 'email')->ignore($this->user?->id)],
+            'role' => ['required'],
+            'password' => [
+                'confirmed',
+                $this->isMethod('POST') ? 'required' : 'nullable', 
+                Password::min(8)
+                    ->letters()
+                    ->numbers()
+                ],
+            'profile_image' => ['nullable', 'image', 'mimes:jpg,jpeg,png,gif', 'max:2048']
         ];
     }
 }
