@@ -10,7 +10,7 @@
                 Login
             </h1>
 
-            <x-forms.form method="POST" action="/login">
+            <x-forms.form method="POST" action="{{ route('login.store') }}">
 
                 <x-forms.input 
                     name="email" 
@@ -18,16 +18,16 @@
                     placeholder="Enter your email" 
                     type="email" />
 
-                <x-forms.input 
-                    name="password" 
-                    label="Password" 
-                    placeholder="Enter your password" 
-                    type="password" />
+                <x-forms.password />
+
 
 
                 <x-forms.divider />
 
-                <div class="text-right">
+                <div class="text-right space-x-2 ">
+                    <a href="{{ route('forgot-password') }}" class="text-sm underline">
+                        Forgot your password?
+                    </a>
                     <x-forms.button>
                         Sign In
                     </x-forms.button>

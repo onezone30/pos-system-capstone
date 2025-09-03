@@ -10,31 +10,32 @@
                 Register
             </h1>
 
-            <x-forms.form method="POST" action="/register">
+            <x-forms.form method="POST" action="/register" enctype="multipart/form-data">
 
                 <x-forms.input 
                     name="name" 
                     label="Name" 
-                    placeholder="Enter your name"/>
+                    placeholder="Enter your name"
+                    value="{{ old('name') }}"/>
 
                     
                 <x-forms.input 
                     name="email" 
                     label="Email" 
                     placeholder="Enter your email" 
+                    value="{{ old('email') }}"
                     type="email" />
 
                 <x-forms.input 
-                    name="password" 
-                    label="Password" 
-                    placeholder="Enter your password" 
-                    type="password" />
+                    name="profile_image"
+                    type="file" 
+                    label="Profile Image" />
 
-                <x-forms.input 
-                    name="password_confirmation" 
-                    label="Confirm Password" 
-                    placeholder="Enter your confirm password" 
-                    type="password" />
+                <x-forms.password />
+
+                <x-forms.password 
+                    name="password_confirmation"
+                    placeholder="Enter confirm password"/>
 
 
                 <x-forms.divider />
