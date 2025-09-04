@@ -6,6 +6,7 @@ use App\Http\Requests\LoginRequest;
 use App\Models\User;
 use App\Services\AuthServices;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
 
 class LoginController extends Controller
 {
@@ -30,20 +31,28 @@ class LoginController extends Controller
      */
     public function store(LoginRequest $request) {
 
-        return $this->authServices->userLogin($request);
+        $role = $this->authServices->userLogin($request);
+
+        return redirect()->route("{$role}.dashboard")->with('toast', [
+                'message' => 'Successfully Logged In',
+                'type' => 'success'
+            ]);
 
     }
 
-    public function destroy(User $user)
+    public function destroy()
     {
-        $this->authServices->userLogout();
+        Auth::logout();
+        session()->invalidate();
+        session()->regenerate();
 
-        return $this->redirectWithToast(
-            true,
-            "User {$user->name} successfully logged out",
-            "User {$user->name} failed to log out",
-            'login'
-        );
+        return redirect()
+                    ->route('login')
+                    ->with('toast', [
+                        'type' => 'success',
+                        'message' => "User successfully logged out"
+                    ]);
+
     }
 
 }

@@ -8,29 +8,38 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Password;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\LoginRequest;
+use App\Services\AuthServices;
+use Exception;
+use Illuminate\Support\Facades\Log;
 
 class ForgotPasswordController extends Controller
 {
+    public function __construct(
+        protected AuthServices $authServices
+    ){}
+
     public function create()
     {
-    return view('auth.forgot-password');
+        return view('auth.forgot-password');
     }
 
     public function store(Request $request) 
     {
-        $request->validate([
-            'email' => ['required', 'email', 'exists:users,email'],
+        $validate = $request->validate([
+            'email' => ['email', 'required']
         ]);
 
-        $token = Password::createToken(User::where('email', $request->email)->first());
+        try {
+            $this->authServices->forgotPasswordSendEmail($validate['email']);
 
-        $sendMail = Mail::to($request->email)->send(new PasswordResetMail($token, $request->email));
-
-        return $this->redirectWithToast(
-            $sendMail,
-            'Reset Email Sent',
-            'Failed to send reset email',
-            'login'
-        );
+            return redirect()->route('login')->with('toast', [
+                'message' => 'Reset email sent',
+                'type' => 'success'
+            ]);
+        } catch (Exception $e) {
+            Log::error('Password reset error: ' . $e->getMessage());
+            throw $e; // temporarily throw to see the real error
+        }
     }
 }

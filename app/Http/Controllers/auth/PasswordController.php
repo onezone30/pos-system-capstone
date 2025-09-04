@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Str;
 use App\Http\Controllers\Controller;
 
-class PasswordResetController extends Controller
+class PasswordController extends Controller
 {
     public function create(string $token, Request $request)
     {
@@ -38,12 +38,10 @@ class PasswordResetController extends Controller
             }
         );
 
-        return $this->redirectWithToast(
-            $status === Password::PASSWORD_RESET,
-            'Password reset successfully',
-            __($status),
-            'login'
-        );
+        return redirect()->route('login')->with('toast', [
+            'type' => 'success',
+            'message' => 'Password reset successfully'
+        ]);
 
 
     }

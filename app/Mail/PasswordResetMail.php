@@ -14,8 +14,8 @@ class PasswordResetMail extends Mailable
 {
     use Queueable, SerializesModels;
 
-    private string $email;
-    private string $token; 
+    public string $email;
+    public string $token; 
 
     /**
      * Create a new message instance.
@@ -45,6 +45,7 @@ class PasswordResetMail extends Mailable
             view: 'mails.password-reset-mail',
             with: [
                 'email' => $this->email,
+                'token' => $this->token,
                 'url' => url("/reset-password/{$this->token}?email={$this->email}")
             ]
         );
