@@ -29,6 +29,7 @@ class UserFactory extends Factory
             'email_verified_at' => now(),
             'role' => fake()->randomElement(['customer', 'admin', 'cashier']),
             'password' => static::$password ??= Hash::make('password'),
+            'profile_image' => fake()->imageUrl(),
             'remember_token' => Str::random(10),
         ];
     }
@@ -44,6 +45,13 @@ class UserFactory extends Factory
     {
         return $this->state(fn(array $attributes) => [
             'role' => 'admin'
+        ]);
+    }
+    
+    public function customer()
+    {
+        return $this->state(fn(array $attributes) => [
+            'role' => 'customer'
         ]);
     }
 
