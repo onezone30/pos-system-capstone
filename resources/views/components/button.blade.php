@@ -14,6 +14,6 @@
     $classes = $colorClasses[$color] ?? $colorClasses['blue'];
 @endphp
 
-<a {{ $attributes }} class="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white rounded-lg focus:ring-4 focus:outline-none transition-colors duration-200 {{ $classes }}">
+<a {{ $attributes }} class="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white rounded-lg focus:ring-4 focus:outline-none transition-colors duration-200 cursor-pointer {{ $classes }}">
     {{ $slot }}
 </a>

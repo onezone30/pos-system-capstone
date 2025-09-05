@@ -16,8 +16,20 @@
         <!-- Include Flowbite JS -->
         <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.3.0/flowbite.min.js"></script>
 
+        <!-- Include Alpine JS -->
+        <script src="https://unpkg.com/alpinejs@3.x.x" defer></script>
+
+        <link
+            rel="stylesheet"
+            type="text/css"
+            href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.2/src/bold/style.css"
+        >
     </head>
     <body class="bg-gray-950 text-white">
+
+        @if (session('toast'))
+            <x-toast :message="session('toast')['message']" :type="session('toast')['type']" />
+        @endif
 
         {{ $slot }}
 

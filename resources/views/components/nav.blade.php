@@ -17,28 +17,28 @@
         <div class="hidden w-full md:block md:w-auto" id="navbar-default">
             <ul class="font-medium flex flex-col p-4 md:p-0 mt-4 border border-gray-100 rounded-lg bg-gray-50 md:flex-row md:space-x-8 rtl:space-x-reverse md:mt-0 md:border-0 md:bg-white dark:bg-gray-800 md:dark:bg-gray-900 dark:border-gray-700">
                 <li>
-                    <x-nav-link href="/">
+                    <x-nav-link href="{{ route('home') }}">
                         Home
                     </x-nav-link>
                 </li>
                 @guest
-                <li>
-                    <x-nav-link href="/login">
-                        Log In
-                    </x-nav-link>
-                </li>
-                <li>
-                    <x-nav-link href="/register">
-                        Register
-                    </x-nav-link>
-                </li>
+                    <li>
+                        <x-nav-link href="{{ route('login') }}">
+                            Log In
+                        </x-nav-link>
+                    </li>
+                    <li>
+                        <x-nav-link href="{{ route('register') }}">
+                            Register
+                        </x-nav-link>
+                    </li>
                 @endguest
                 @auth
-                <li>
-                    <x-nav-link href="/logout">
-                        Log Out
-                    </x-nav-link>
-                </li>
+                    <li>
+                        <x-nav-link href="{{ route('logout') }}">
+                            Log Out
+                        </x-nav-link>
+                    </li>
                 @endauth
             </ul>
         </div>
