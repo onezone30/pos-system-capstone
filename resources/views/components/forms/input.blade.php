@@ -1,9 +1,10 @@
 @props([
     'name', 
-    'label',
+    'label' => false,
     'type' => 'text',
     'placeholder' => false,
-    'class' => 'w-full px-6 py-4 bg-white text-black rounded-md'
+    'class' => 'w-full px-6 py-4 bg-white text-black rounded-md',
+    'value' => ''
     ])
 
 
@@ -14,7 +15,8 @@
             type="{{ $type }}" 
             name="{{ $name }}" 
             class="{{ $class }}"
-            placeholder="{{ $placeholder }}" />
+            placeholder="{{ $placeholder }}"
+            value="{{ $value }}" />
     
 
 </x-forms.field>

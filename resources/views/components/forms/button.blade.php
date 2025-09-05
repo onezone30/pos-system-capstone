@@ -1,6 +1,8 @@
-@props(['class' => 'px-6 py-4 bg-emerald-500 hover:bg-emerald-600 rounded-xl font-bold uppercase cursor-pointer'])
+@props([
+    'class' => 'px-6 py-4 bg-emerald-500 hover:bg-emerald-600 rounded-xl font-bold uppercase cursor-pointer',
+    'type' => 'submit'])
 
 
-<button {{ $attributes }} class="{{ $class }}">
+<button {{ $attributes }} class="{{ $class }}" type="{{ $type }}">
     {{ $slot }}
 </button>
