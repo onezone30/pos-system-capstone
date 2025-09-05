@@ -10,7 +10,7 @@ use App\Models\ProductPrices;
 
 class ProductServices {
 
-    private function syncPrices(Product $product, array $priceRequest) {
+    private function syncPrices(object $product, array $priceRequest) {
 
         $sizes = $priceRequest['size'] ?? [];
         $prices = $priceRequest['price'] ?? [];
@@ -33,7 +33,7 @@ class ProductServices {
     }
 
 
-    public function saveProduct(?Product $product, ProductRequest $productRequest, PriceRequest $priceRequest) {
+    public function saveProduct(?object $product, object $productRequest, object $priceRequest) {
 
         $productData = $productRequest->validated();
         $priceData = $priceRequest->validated();

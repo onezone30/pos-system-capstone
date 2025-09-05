@@ -2,7 +2,6 @@
 
 namespace App\Services;
 
-use App\Http\Requests\UserRequest;
 use App\Models\User;
 use Illuminate\Http\Request;
 
@@ -10,8 +9,15 @@ class UserServices {
 
     private function updateProfile(Request $request) 
     {
-        if(request()->hasFile('profile_image')) {
-            return $request->file('profile_image')->store('images/users/profiles', 'public');
+        if($request->hasFile('profile_image')) {
+
+            $image = $request->file('profile_image');
+
+            $imageName = time() . '_' . str_replace(' ', '_', $image->getClientOriginalName());
+
+            $imagePath = $image->storeAs('images/profiles', $imageName, 'public');
+
+            return $imagePath;
 
         }
 
@@ -19,52 +25,43 @@ class UserServices {
 
     }
 
-    public function createUser(UserRequest $userRequest) 
+    public function createUser(object $userRequest) 
     {
         $attributes = $userRequest->validated();
 
         $userData = [
             'name' => $attributes['name'],
             'email' => $attributes['email'],
+            'profile_image' => $this->updateProfile($userRequest),
             'role' => $attributes['role'],
-            'password' => $attributes['password'],
-            'profile_image' => $this->updateProfile($userRequest)
+            'password' => bcrypt($attributes['password'])
         ];
 
         $user = User::create($userData);
 
-        if(!$user){
-            return back()->with('toast', [
-                'message' => 'User Registration Failed!',
-                'type' => 'error'
-            ]);
-        }
+        return $user;
 
-        return redirect()->route($user->role . '.dashboard')->with('toast', [
-            'message' => 'User Registration Success!',
-            'type' => 'success'
-        ]);
     }
     
-    public function updateUser(User $user, UserRequest $userRequest) {
+    public function updateUser(object $user, object $userRequest) {
 
-        $userRequest = $userRequest->validated();
+        $validate = $userRequest->validated();
 
         $userData = [
-            'name' => $userRequest['name'],
-            'email' => $userRequest['email'],
-            'role' => $userRequest['role'],
-            'profile_image' => $userRequest['profile_image'] ?? $user->profile_image
+            'name' => $validate['name'],
+            'email' => $validate['email'],
+            'role' => $validate['role'],
+            'profile_image' => $this->updateProfile($userRequest) ?? $user->profile_image
         ];
 
         if(!empty($userRequest['password'])) {
-            $userData[] = $userRequest['password'];
+            $userData[] = bcrypt($userRequest['password']);
         }
 
         return $user->update($userData);
     }
 
-    public function deleteUser(User $user)
+    public function deleteUser(object $user)
     {
         return $user->delete();
     }
