@@ -33,8 +33,7 @@ class UserRequest extends FormRequest
                 Password::min(8)
                     ->letters()
                     ->numbers()
-                ],
-            'profile_image' => ['nullable', 'image', 'mimes:jpg,jpeg,png,gif', 'max:2048']
+                ]
         ];
     }
 }
