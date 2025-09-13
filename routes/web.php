@@ -2,28 +2,53 @@
 
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\CashierController;
+use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\CustomerController;
-use App\Http\Controllers\LoginController;
+use App\Http\Controllers\auth\ForgotPasswordController;
+use App\Http\Controllers\auth\LoginController;
+use App\Http\Controllers\auth\PasswordController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\UserController;
-use App\Models\User;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
 
+Route::get('/', function() {
+    dd('home');
+})
+    ->name('home');
+
+Route::middleware(['guest'])->group(function() {
+    Route::get('/login', [LoginController::class, 'create'])
+        ->name('login');
+    Route::post('/login', [LoginController::class, 'store'])
+        ->name('login.store');
+
+    Route::get('/register', [UserController::class, 'create'])
+        ->name('register');
+    Route::post('/register', [UserController::class, 'store'])
+        ->name('register.store');
 
 
-Route::get('/', [LoginController::class, 'create'])
-    ->name('login')
-    ->middleware('guest');
 
-Route::get('/register', [UserController::class, 'create'])
-    ->middleware('guest');
+    // forgot password
+    Route::get('/forgot-password', [ForgotPasswordController::class, 'create'])
+        ->name('forgot-password');
+    Route::post('/forgot-password', [ForgotPasswordController::class, 'store'])
+        ->middleware('guest')
+        ->name('forgot-password.email');
 
-Route::post('/register', [UserController::class, 'store'])
-    ->middleware('guest');
-Route::post('/login', [LoginController::class, 'store'])
-    ->middleware('guest');
+    // reset password
+    Route::get('/reset-password/{token}', [PasswordController::class, 'create'])
+        ->name('reset-password');
+    Route::post('/reset-password', [PasswordController::class, 'store'])
+        ->name('password.update');
+
+});
+
+Route::get('/logout', [LoginController::class, 'destroy'])
+        ->name('logout')
+        ->middleware('auth');
+
 
 
 // customer
@@ -50,7 +75,7 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->group(function() {
 
     // products
     Route::get('/products', [ProductController::class, 'index'])
-        ->name('admin.products');
+        ->name('admin.products'); 
     Route::post('/products', [ProductController::class, 'store'])
         ->name('admin.products.store');
     Route::patch('/products/{product}', [ProductController::class, 'update'])
@@ -62,10 +87,21 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->group(function() {
     // users
     Route::get('/users', [UserController::class, 'index'])
         ->name('admin.users');
+    Route::post('/users', [UserController::class, 'store']);
     Route::patch('/users/{user}', [UserController::class, 'update'])
         ->name('admin.users.update');
     Route::delete('/users/{user}', [UserController::class, 'destroy'])
         ->name('admin.users.destroy');
+
+    // categories
+    Route::get('/categories', [CategoryController::class, 'index'])
+        ->name('admin.categories');
+    Route::post('/categories', [CategoryController::class, 'store'])
+        ->name('admin.categories.store');
+    Route::patch('/categories/{category}', [CategoryController::class, 'update'])
+        ->name('admin.categories.update');
+    Route::delete('/categories/{category}', [CategoryController::class, 'delete'])
+        ->name('admin.categories.destroy');
 });
 
 
@@ -74,5 +110,3 @@ Route::middleware(['auth', 'role:cashier'])->prefix('cashier')->group(function()
     Route::get('/dashboard', [CashierController::class, 'index'])
         ->name('cashier.dashboard');
 });
-
-Route::get('/logout', [LoginController::class, 'destroy']);

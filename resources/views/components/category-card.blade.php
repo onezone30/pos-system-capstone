@@ -1,16 +1,23 @@
-<div class="relative flex flex-col my-6 bg-white shadow-sm border border-slate-200 rounded-lg w-96">
-    <div class="p-4">
-        <h5 class="mb-2 text-slate-800 text-xl font-semibold">
-        Website Review Check Update from Our Team in San Francisco
+@props(['category'])
+
+<x-button
+    data-modal-target="view-category-modal-{{ $category->id }}"
+    data-modal-toggle="view-category-modal-{{ $category->id }}"
+    color="green"
+    class="flex flex-col items-center bg-white border border-gray-200 rounded-lg shadow-sm md:flex-row md:max-w-xl hover:bg-gray-100 dark:border-gray-700 dark:bg-gray-800 dark:hover:bg-gray-700">
+    <div class="flex flex-col justify-between p-4 leading-normal">
+        <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
+            {{ $category->name }}
         </h5>
-        <p class="text-slate-600 leading-normal font-light">
-        The place is close to Barceloneta Beach and bus stop just 2 min by walk and near to Naviglio where you can enjoy the main night life in Barcelona.
+
+        @if($category->description)
+        <p class="mb-3 font-normal text-gray-700 dark:text-gray-400">
+            {{ $category->description }}
         </p>
-
-        <!-- buttons -->
-
-        <button class="rounded-md bg-slate-800 py-2 px-4 mt-6 border border-transparent text-center text-sm text-white transition-all shadow-md hover:shadow-lg focus:bg-slate-700 focus:shadow-none active:bg-slate-700 hover:bg-slate-700 active:shadow-none disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none" type="button">
-        Read more
-        </button>
+        @else
+        <p class="mb-3 font-normal text-gray-700 dark:text-gray-400">
+            No Description
+        </p>
+        @endif
     </div>
-</div>
+</x-button>
