@@ -21,7 +21,7 @@ class ProductController extends Controller
     public function index()
     {
         $user = Auth::user();
-        $products = Product::with('prices')->get();
+        $products = Product::with(['prices', 'category'])->get();
         $categories = Category::all();
 
         return view($user->role . '.products.index', [
