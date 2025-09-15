@@ -6,7 +6,7 @@
     <div class="relative overflow-hidden">
         <div class="aspect-square p-6 bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-700 dark:to-gray-800">
             <img class="w-full h-full object-cover rounded-xl group-hover:scale-105 transition-transform duration-300" 
-                 src="https://placehold.co/250x250/6366f1/ffffff?text={{ urlencode($product->name) }}" 
+                 src="" 
                  alt="{{ $product->name }}" />
         </div>
         
@@ -22,6 +22,10 @@
         <!-- Product Name -->
         <h5 class="mb-3 text-xl font-bold text-center text-gray-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors duration-200">
             {{ $product->name }}
+        </h5>
+
+        <h5 class="mb-3 text-base font-bold text-center text-gray-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors duration-200">
+            {{ $product->category?->name ?? 'No Category' }}
         </h5>
 
         <!-- Prices Section -->
@@ -42,7 +46,7 @@
                                     {{ $price->size }}
                                 </span>
                                 <span class="font-bold text-lg text-indigo-600 dark:text-indigo-400">
-                                    ${{ number_format($price->price, 2) }}
+                                    ₱{{ number_format($price->price, 2) }}
                                 </span>
                             </div>
                         @endif
