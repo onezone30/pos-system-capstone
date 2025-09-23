@@ -43,6 +43,7 @@ class CreateProductForm extends Component
 
         $this->dispatch('createProduct');
         $this->resetForm();
+        $this->dispatch('close-create-modal');
     }
 
     private function resetForm()
