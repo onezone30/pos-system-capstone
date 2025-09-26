@@ -1,4 +1,4 @@
-@props(['name', 'label'])
+@props(['name'=> null, 'label'])
 
 @php
 

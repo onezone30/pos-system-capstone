@@ -1,14 +1,21 @@
 @props([
-    'name', 
+    'name' => null, 
     'label' => false,
     'type' => 'text',
     'placeholder' => false,
     'class' => 'w-full px-6 py-4 bg-white text-black rounded-md',
-    'value' => ''
     ])
 
 
-<x-forms.field :label="$label" :name="$name">
+@php
+
+    $model = $attributes->get('wire:model') ?? $name;
+
+    $error = $errors->first($model);
+
+@endphp
+
+<x-forms.field :label="$label" :name="$model">
 
         <input 
             label="{{ $label }}"
@@ -16,7 +23,7 @@
             name="{{ $name }}" 
             class="{{ $class }}"
             placeholder="{{ $placeholder }}"
-            value="{{ $value }}" />
+            {{ $attributes }}/>
     
 
 </x-forms.field>
