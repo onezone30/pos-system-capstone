@@ -19,12 +19,10 @@ class AuthServices {
     {
         $credentials = $request->validated();
 
-        if(!Auth::attempt($credentials)) {
-
-            return back()->withErrors([
-                'email' => 'The provided credentials do not match our records'
-            ])->onlyInput('email');
-      
+        if (!Auth::attempt($credentials)) {
+            throw \Illuminate\Validation\ValidationException::withMessages([
+                'email' => 'The provided credentials do not match our records.',
+            ]);
         }
 
         $request->session()->regenerate();
