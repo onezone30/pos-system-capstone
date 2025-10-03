@@ -14,12 +14,10 @@ class ProductList extends Component
         'editProduct' => '$refresh'
     ];
 
-
     public function delete(int $id)
     {
         Product::findOrFail($id)->delete();
 
-        $this->dispatch('deleteProduct');
         $this->dispatch('close-delete-modal');
     }
 

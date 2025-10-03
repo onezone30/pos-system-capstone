@@ -8,13 +8,17 @@ use App\Models\ProductPrices;
 use App\Services\ProductServices;
 use Livewire\Attributes\On;
 use Livewire\Component;
+use Livewire\WithFileUploads;
 
 class EditProductForm extends Component
 {
+    use WithFileUploads;
+
     public Product $product;
 
     public string $name;
     public int $category_id;
+    public $product_image;
 
     public array $sizes = ['small', 'medium', 'large'];
     public array $prices = [];
@@ -23,17 +27,18 @@ class EditProductForm extends Component
     protected $rules = [
         'name' => 'required|string|max:255',
         'category_id' => 'required|exists:categories,id',
-        'prices.*' => 'required|numeric|min:0',
-        'quantities.*' => 'required|integer|min:0',
+        'prices.*' => 'nullable|numeric|min:0',
+        'quantities.*' => 'nullable|integer|min:0',
+        'product_image' => 'nullable|image'
     ];
 
     #[On('open-edit-modal')]
     public function load($id)
     {
         $this->product = Product::with('prices')->findOrFail($id);
-
         $this->name = $this->product->name;
         $this->category_id = $this->product->category_id;
+        $this->product_image = $this->product->product_image;
 
         foreach($this->sizes as $index => $size) {
             $price = $this->product->prices->where('size', $size)->first();
@@ -48,6 +53,7 @@ class EditProductForm extends Component
 
         $productData = [
             'name'              => $validate['name'],
+            'product_image'     => $validate['product_image'],
             'category_id'       => $validate['category_id'],
         ];
 
@@ -55,8 +61,8 @@ class EditProductForm extends Component
         foreach ($this->sizes as $index => $size) {
             $priceData[] = [
                 'size'           => $size,
-                'quantity_stock' => $this->quantities[$index],
-                'price'          => $this->prices[$index],
+                'quantity_stock' => $this->quantities[$index] === '' ? null : $this->quantities[$index] ,
+                'price'          => $this->prices[$index] === '' ? null : $this->prices[$index],
             ];
         }
 
