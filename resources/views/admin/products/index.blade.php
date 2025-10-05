@@ -5,21 +5,24 @@
             <h1 class="text-2xl font-bold">
                 Products
             </h1>
-
-            <x-button data-modal-target="crud-modal" data-modal-toggle="crud-modal">
+            
+            <x-button x-data x-on:click="$dispatch('open-create-modal')">
                 Add Product
             </x-button>
             
             <!-- add modal -->
             <x-modals.create header="Create Product">
-
-                @livewire('product.create-product-form')
-                
+                @livewire('product.create-product-form')     
             </x-modals.create>
 
         </div>
         
-        <livewire:product.product-list />
+        <x-section>
+
+            <livewire:product.product-list/>
+
+        </x-section>
+        
 
 
 </x-main>

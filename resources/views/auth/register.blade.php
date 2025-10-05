@@ -26,6 +26,12 @@
                     value="{{ old('email') }}"
                     type="email" />
 
+                <x-forms.select label="Role" name="role">
+                    @foreach (App\Models\User::ROLES as $role)
+                    <option value="{{ $role }}">{{ ucfirst($role) }}</option>
+                    @endforeach
+                </x-forms.select>
+
                 <x-forms.input 
                     name="profile_image"
                     type="file" 

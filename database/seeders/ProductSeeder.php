@@ -15,10 +15,10 @@ class ProductSeeder extends Seeder
     public function run(): void
     {
         $this->call(CategorySeeder::class);
-        Product::factory(10)->create()->each(function ($product) {
-            ProductPrices::factory()->count(3)->allSizes()->create([
-                'product_id' => $product->id
-            ]);
-        });
+        // Product::factory(10)->create()->each(function ($product) {
+        //     ProductPrices::factory()->count(3)->allSizes()->create([
+        //         'product_id' => $product->id
+        //     ]);
+        // });
     }
 }

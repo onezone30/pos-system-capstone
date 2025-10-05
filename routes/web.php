@@ -8,12 +8,15 @@ use App\Http\Controllers\auth\ForgotPasswordController;
 use App\Http\Controllers\auth\LoginController;
 use App\Http\Controllers\auth\PasswordController;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\SearchController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
 
 Route::get('/', function() {
-    dd('home');
+
+
+    return view('welcome');
 })
     ->name('home');
 
@@ -92,6 +95,8 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->group(function() {
         ->name('admin.users.update');
     Route::delete('/users/{user}', [UserController::class, 'destroy'])
         ->name('admin.users.destroy');
+    Route::get('/users', SearchController::class)
+        ->name('admin.users.search');
 
     // categories
     Route::get('/categories', [CategoryController::class, 'index'])
@@ -100,7 +105,7 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->group(function() {
         ->name('admin.categories.store');
     Route::patch('/categories/{category}', [CategoryController::class, 'update'])
         ->name('admin.categories.update');
-    Route::delete('/categories/{category}', [CategoryController::class, 'delete'])
+    Route::delete('/categories/{category}', [CategoryController::class, 'destroy'])
         ->name('admin.categories.destroy');
 });
 

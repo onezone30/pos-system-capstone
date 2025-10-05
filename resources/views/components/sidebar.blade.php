@@ -23,7 +23,7 @@
 						<img 
 							class="w-8 h-8 rounded-full"
 							alt="Profile Pic" 
-							src="{{ asset('storage/' . $user->profile_image) }}">
+							src="{{ asset('storage/' . $user->profile_image) }} ">
 						</button>
 					</div>
 					<div class="z-50 hidden my-4 text-base list-none bg-white divide-y divide-gray-100 rounded-sm shadow-sm dark:bg-gray-700 dark:divide-gray-600" id="dropdown-user">

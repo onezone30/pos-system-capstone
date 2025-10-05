@@ -26,10 +26,7 @@
     <!-- rendering modals -->
     <!-- Delete Modal -->
     <x-modals.delete action="delete" />
-    <!-- Edit Modal -->
-    <x-modals.edit action="edit">
-        <livewire:product.edit-product-form/>
-    </x-modals.edit>
+
 
 </div>
 

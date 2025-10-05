@@ -4,64 +4,58 @@ namespace App\Services;
 
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
+use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 
 class UserServices {
 
-    private function updateProfile(Request $request) 
+    private function updateProfile(?TemporaryUploadedFile $file, ?string $oldPath = null) 
     {
-        if($request->hasFile('profile_image')) {
+        if($file) {
 
-            $image = $request->file('profile_image');
+            $imageName = time() . '_' . str_replace(' ', '_', $file->getClientOriginalName());
+            $imagePath = $file->storeAs('images/profiles', $imageName, 'public');
 
-            $imageName = time() . '_' . str_replace(' ', '_', $image->getClientOriginalName());
-
-            $imagePath = $image->storeAs('images/profiles', $imageName, 'public');
+            if($oldPath) {
+                Storage::disk('public')->delete($oldPath);
+            }
 
             return $imagePath;
-
         }
-
-        return null;
-
+        
+        return $oldPath;
     }
 
-    public function createUser(object $userRequest) 
+    public function createUser(array $attributes) 
     {
-        $attributes = $userRequest->validated();
-
         $userData = [
             'name' => $attributes['name'],
             'email' => $attributes['email'],
-            'profile_image' => $this->updateProfile($userRequest),
+            'profile_image' => $this->updateProfile($attributes['profile_image'] ?? null),
             'role' => $attributes['role'],
             'password' => bcrypt($attributes['password'])
         ];
 
-        $user = User::create($userData);
-
-        return $user;
-
+        return User::create($userData);
     }
     
-    public function updateUser(object $user, object $userRequest) {
-
-        $validate = $userRequest->validated();
+    public function updateUser(User $user, array $attributes) {
 
         $userData = [
-            'name' => $validate['name'],
-            'email' => $validate['email'],
-            'role' => $validate['role'],
-            'profile_image' => $this->updateProfile($userRequest) ?? $user->profile_image
+            'name' => $attributes['name'],
+            'email' => $attributes['email'],
+            'role' => $attributes['role'],
+            'profile_image' => $this->updateProfile($attributes['profile_image'] ?? null),
         ];
 
-        if(!empty($userRequest['password'])) {
-            $userData[] = bcrypt($userRequest['password']);
+        if(!empty($attributes['password'])) {
+            $userData[] = bcrypt($attributes['password']);
         }
 
         return $user->update($userData);
     }
 
-    public function deleteUser(object $user)
+    public function deleteUser(User $user)
     {
         return $user->delete();
     }

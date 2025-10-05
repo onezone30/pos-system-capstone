@@ -1,8 +1,6 @@
-@props(['user'])
-
 <x-layout>
 
-    <x-sidebar :user="$user" />
+    <x-sidebar :user="Auth::user()" />
 
     <main class="p-4 sm:ml-64 mt-14">
 

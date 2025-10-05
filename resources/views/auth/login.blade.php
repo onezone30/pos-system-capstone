@@ -20,8 +20,6 @@
 
                 <x-forms.password />
 
-
-
                 <x-forms.divider />
 
                 <div class="text-right space-x-2 ">
