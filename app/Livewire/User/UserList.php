@@ -10,6 +10,7 @@ class UserList extends Component
 {
     protected $listeners = [
         'deleteUser' => '$refresh',
+        'createUser' => '$refresh',
     ];
 
     public function delete(int $id)

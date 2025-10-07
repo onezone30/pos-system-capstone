@@ -51,6 +51,7 @@ class CreateUserForm extends Component
 
         $this->reset(['name', 'email', 'role', 'profile_image', 'password', 'password_confirmation']);
         $this->dispatch('close-create-modal');
+        $this->dispatch('createUser');
     }
 
     public function render()
