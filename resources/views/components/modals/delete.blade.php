@@ -5,7 +5,10 @@
         name = $event.detail.name;
         open = true
     "
-    x-on:close-delete-modal.window="open = false"
+    x-on:success-delete.window="
+        open = false;
+        $dispatch('close-delete-modal');
+    "
     x-show="open"
     x-transition
     x-cloak
@@ -39,23 +42,20 @@
                 This action <b>cannot</b> be undone.
             </p>
 
-            <button 
-                type="submit"
-                @click="$wire.delete(id)"
-                class="text-white bg-red-600 hover:bg-red-800 focus:ring-4 focus:outline-none 
-                        focus:ring-red-300 dark:focus:ring-red-800 font-medium rounded-lg text-sm 
-                        px-5 py-2.5">
-                Yes, delete it
-            </button>
 
-            <button 
-                type="button"
-                @click="open = false"
-                class="px-5 py-2.5 text-sm font-medium text-gray-900 bg-white border rounded-lg 
-                        hover:bg-gray-100 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 
-                        dark:hover:text-white dark:hover:bg-gray-700">
+            <x-button 
+                color="red" 
+                wire:click="delete(id)"
+                wire:target="delete">
+                Yes, delete it
+            </x-button>
+
+            <x-button 
+                color="red" 
+                @click="open = false" 
+                wire:target="delete">
                 Cancel
-            </button>
+            </x-button>
 
         </div>
     </div>
