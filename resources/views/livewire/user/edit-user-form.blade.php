@@ -1,4 +1,6 @@
 <div 
+    x-on:open-edit-modal.window="open = true"
+    x-on:close-edit-modal.window="open = false"
     x-data="{ open: false }"
     x-show="open"
     x-cloak
@@ -8,8 +10,6 @@
     x-transition:leave="transition ease-in duration-300"
     x-transition:leave-start="opacity-100 translate-y-0"
     x-transition:leave-end="opacity-0 -translate-y-10"
-    x-on:open-create-modal.window="open = true"
-    x-on:close-create-modal.window="open = false"
 >
 
     <form wire:submit.prevent="update">
@@ -34,29 +34,28 @@
                 placeholder="Enter email"
                 label="Email"/>
 
-            <x-forms.input 
-                wire:model="profile_image"
-                type="file" 
-                label="Profile Image" />
+            <x-forms.file 
+                label="Profile Picture"
+                wire:model="profile_image"/>
 
-            <x-forms.input 
-                wire:model="password" 
-                label="Password" 
-                placeholder="Enter your password" 
-                type="password" />
-
-            <x-forms.input 
-                wire:model="password_confirmation" 
-                label="Confirm Password" 
-                placeholder="Enter your confirm password" 
-                type="password" />
+            <x-forms.password 
+                wire:model="password"
+                name="password"
+                placeholder="Enter password"
+                label="Password"/>
+            
+            <x-forms.password 
+                wire:model="password_confirmation"
+                name="password_confirmation"
+                placeholder="Enter confirm password"
+                label="Confirm Password"/>
 
 
             <!-- Create Button -->
             <div class="flex justify-end mt-4">
-                <x-forms.button>
-                    Create User
-                </x-forms.button>
+                <x-button size="2xl" color="blue" wire:click="update" wire:target="update">
+                    Update User
+                </x-button>
             </div>
 
         </div>

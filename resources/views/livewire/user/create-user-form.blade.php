@@ -21,6 +21,7 @@
                 placeholder="Enter user name"/>
 
             <x-forms.select label="Select Role" wire:model="role">
+                <option value="">-- Select Role --</option>
                 @foreach (App\Models\User::ROLES as $role)
                     <option value="{{ $role }}">
                         {{ ucfirst($role) }}
@@ -34,29 +35,29 @@
                 placeholder="Enter email"
                 label="Email"/>
 
-            <x-forms.input 
+            <x-forms.file 
+                label="Profile Picture"
                 wire:model="profile_image"
-                type="file" 
-                label="Profile Image" />
+            />
 
-            <x-forms.input 
-                wire:model="password" 
-                label="Password" 
-                placeholder="Enter your password" 
-                type="password" />
-
-            <x-forms.input 
-                wire:model="password_confirmation" 
-                label="Confirm Password" 
-                placeholder="Enter your confirm password" 
-                type="password" />
+            <x-forms.password 
+                wire:model="password"
+                name="password"
+                placeholder="Enter password"
+                label="Password"/>
+            
+            <x-forms.password 
+                wire:model="password_confirmation"
+                name="password_confirmation"
+                placeholder="Enter confirm password"
+                label="Confirm Password"/>
 
 
             <!-- Create Button -->
             <div class="flex justify-end mt-4">
-                <x-forms.button>
+                <x-button size="2xl" color="blue" wire:click="create" wire:target="create">
                     Create User
-                </x-forms.button>
+                </x-button>
             </div>
 
         </div>
