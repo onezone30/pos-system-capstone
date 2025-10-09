@@ -5,9 +5,18 @@
     'class' => 'w-full px-6 py-4 bg-white text-black rounded-md',
 ])
 
-<x-forms.field :label="$label" :name="$name">
+@php
+
+    $model = $attributes->get('wire:model') ?? $name;
+
+    $error = $errors->first($model);
+
+@endphp
+
+<x-forms.field :label="$label" :name="$model">
     <div class="relative w-full">
         <input
+            {{ $attributes }}
             type="password"
             id="password-input-{{ $name }}"
             name="{{ $name }}"
