@@ -6,12 +6,23 @@ use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Component;
 
+use function PHPSTORM_META\map;
+
 class UserList extends Component
 {
+    public string $search = "";
+
     protected $listeners = [
         'deleteUser' => '$refresh',
         'createUser' => '$refresh',
+        'editUser' => '$refresh',
+        'searchUpdated' => 'userSearch',
     ];
+
+    public function userSearch($search)
+    {
+        $this->search = trim($search);
+    }
 
     public function delete(int $id)
     {
@@ -23,11 +34,16 @@ class UserList extends Component
 
     public function render()
     {
-        $users = User::all();
-        $user = Auth::user();
+        $users = User::query()
+            ->when($this->search, function($query) {
+                $query->where('name', 'like', "%{$this->search}%")
+                    ->orWhere('role', 'like', "%{$this->search}%")
+                    ->orWhere('email', 'like', "%{$this->search}%");
+            })
+            ->latest()
+            ->get();
 
         return view('livewire.user.user-list', [
-            'user' => $user,
             'users' => $users
         ]);
     }

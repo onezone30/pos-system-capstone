@@ -32,7 +32,7 @@ class UserController extends Controller
 
     public function store(UserRequest $userRequest)
     {
-        $user = $this->userServices->createUser($userRequest);
+        $user = $this->userServices->create($userRequest);
 
         return back()->with('toast', [
             'message' => "User {$user->name} has been registered successfully!",
@@ -42,7 +42,7 @@ class UserController extends Controller
 
     public function update(User $user, UserRequest $userRequest) 
     {
-        $this->userServices->updateUser($user, $userRequest);
+        $this->userServices->update($user, $userRequest);
 
         return back()->with('toast', [
             'message' => "User {$user->name} has been updated successfully!",
@@ -52,7 +52,7 @@ class UserController extends Controller
 
     public function destroy(User $user)
     {
-        $this->userServices->deleteUser($user);
+        $this->userServices->delete($user);
 
         return back()->with('toast', [
             'message' => "User {$user->name} has been deleted successfully!",

@@ -6,6 +6,7 @@ use App\Models\Category;
 use Livewire\WithFileUploads;
 use App\Services\ProductServices;
 use Illuminate\Support\Facades\Log;
+use Livewire\Attributes\Validate;
 use Livewire\Component;
 
 class CreateProductForm extends Component
@@ -14,57 +15,48 @@ class CreateProductForm extends Component
 
     public string $name = '';
     public int $category_id = 0;
-    public $product_image = null;
+     #[Validate('nullable|image|max:2048')]
+    public $product_image;
 
     public array $sizes = ['small', 'medium', 'large'];
     public array $prices = [];
     public array $quantities = [];
 
-
-    public function create(ProductServices $productServices)
+    public function rules() 
     {
-        $validated = $this->validate([
+        return [
             'name'          => 'required|string|max:255',
             'category_id'   => 'required|exists:categories,id',
 
-            // Arrays must match your sizes length
             'prices'        => 'array',
             'quantities'    => 'array',
 
-            // Each price: only validate numeric if it's not null
             'prices.*'      => 'required_with:quantities.*|numeric|min:0',
 
-            // Each quantity: only validate integer if it's not null
             'quantities.*'  => 'required_with:prices.*|integer|min:0',
-
-            'product_image' => 'nullable|image',
-        ]);
-
-
-
-        if($this->product_image) {
-            $fileName = time() . '_' . str_replace(' ', '_', $this->product_image->getClientOriginalName());
-
-            $path = $this->product_image->storeAs('images/products', $fileName, 'public');
-        } else {
-            $path = null;
-        }
+            'product_image' => 'nullable|image|max:2048',
+        ];
+    }
 
 
-        $productServices->create([
-            'name'          => $validated['name'],
-            'category_id'   => $validated['category_id'],
-            'product_image' => $path,
+    public function create(ProductServices $productServices)
+    {
+        $this->validate();
+
+        $productData = [
+            'name'          => $this->name,
+            'category_id'   => $this->category_id,
+            'product_image' => $this->product_image,
             'sizes'         => $this->sizes,
-            'prices'        => $validated['prices'],
-            'quantities'    => $validated['quantities']
-        ]);
+            'prices'        => $this->prices,
+            'quantities'    => $this->quantities
+        ];
 
+        $productServices->create($productData);
 
         $this->dispatch('createProduct');
         $this->resetForm();
         $this->dispatch('close-create-modal');
-
     }
 
     private function resetForm()

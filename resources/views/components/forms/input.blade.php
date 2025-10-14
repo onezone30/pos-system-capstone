@@ -21,9 +21,8 @@
             label="{{ $label }}"
             type="{{ $type }}" 
             name="{{ $name }}" 
-            class="{{ $class }}"
             placeholder="{{ $placeholder }}"
-            {{ $attributes }}/>
+            {{ $attributes->merge(['class' => $class]) }}/>
     
 
 </x-forms.field>

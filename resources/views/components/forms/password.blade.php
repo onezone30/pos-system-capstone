@@ -18,7 +18,6 @@
         <input
             {{ $attributes }}
             type="password"
-            id="password-input-{{ $name }}"
             name="{{ $name }}"
             class="{{ $class }} pr-12"
             placeholder="{{ $placeholder }}"

@@ -12,19 +12,14 @@ use App\Models\ProductPrices;
 class CategoryServices {
 
 
-    public function createCategory(object $categoryRequest)
+    public function createCategory(array $data)
     {
-        $validate = $categoryRequest->validated();
-
         $categoryData = [
-            'name' => $validate['name'],
-            'description' => $validate['description']
+            'name' => $data['name'],
+            'description' => $data['description']
         ];
 
-        $category = Category::query()
-                        ->create([
-                            $categoryData
-                        ]);
+        $category = Category::create($categoryData);
 
         return $category;
     }
@@ -38,9 +33,7 @@ class CategoryServices {
             'description' => $validate['description']
         ];
 
-        $category->update([
-            $categoryData
-        ]);
+        $category->update($categoryData);
 
         return $category;
     }

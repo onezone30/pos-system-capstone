@@ -1,96 +1,27 @@
-<x-main :user="$user">
+<x-main>
+
+        <h1 class="text-2xl font-bold">
+            Categories
+        </h1>
 
         <div class="flex justify-between items-center">
 
-        
-            <h1 class="text-2xl font-bold">
-                Categories
-            </h1>
-            
-            <x-forms.form action="{{ route('admin.categories.store') }}" method="POST">
-                
-                <x-button data-modal-target="crud-modal" data-modal-toggle="crud-modal">
-                    Add Category
-                </x-button>
+            <livewire:search />
 
-                <x-modals.create header="Create categories">
+            <x-button x-data x-on:click="$dispatch('open-create-modal')">
+                Add Category
+            </x-button>
 
-                    <div class="space-y-6">
-                        <x-forms.input 
-                            name="name"
-                            label="Name"
-                            placeholder="Enter category"
-                            required/>
-
-                        <x-forms.input 
-                            name="description"
-                            label="Description"
-                            placeholder="Enter description"
-                            />
-
-                        <x-slot name="footer">
-                            <x-forms.button>
-                                Create Category
-                            </x-forms.button>
-                        </x-slot>
-                    </div>
-
-                    
-
-                </x-modals.create>
-
-            </x-forms.form>
-
-            
+            <x-modals.create header="Create Category">
+                <livewire:category.create-category-form />
+            </x-modals.create>
 
         </div>
         
-        <div class="mt-5 grid grid-cols-1 gap-y-4 gap-x-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        <x-section>
 
-            @foreach ($categories as $category)
-                <x-category-card :category="$category" />
-                <x-modals.view-category 
-                    :id="$category->id" 
-                    :category="$category" 
-                    header="Category details: {{ $category->name }}"/>
-                <x-modals.delete
-                    :title="$category->name"
-                    id="{{ $category->id }}" 
-                    :action="route('admin.categories.destroy', $category->id)"/>
-                <x-modals.edit 
-                    id="{{ $category->id }}"
-                    header="Edit category: {{ $category->name }}"
-                    :action="route('admin.categories.update', $category->id)">
+            <livewire:category.category-list/>
 
-
-                    <div class="space-y-6">
-                        <x-forms.input 
-                            name="name"
-                            label="Name"
-                            placeholder="Enter category"
-                            value="{{ $category->name }}"
-                            required/>
-
-                        <x-forms.input 
-                            name="description"
-                            label="Description"
-                            placeholder="Enter description"
-                            value="{{ $category->description }}"
-                            />
-
-
-
-
-                    </div>
-                    <x-slot name="footer">
-                        <x-forms.button>
-                            Update Category
-                        </x-forms.button>
-                    </x-slot>
-                
-                </x-modals.edit>
-            @endforeach
-
-        </div>
+        </x-section>
 
 </x-main>

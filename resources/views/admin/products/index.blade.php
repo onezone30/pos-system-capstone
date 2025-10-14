@@ -1,10 +1,12 @@
-<x-main :user="$user">
+<x-main>
+
+        <h1 class="text-2xl font-bold">
+            Products
+        </h1>
 
         <div class="flex justify-between items-center">
 
-            <h1 class="text-2xl font-bold">
-                Products
-            </h1>
+            <livewire:search placeholder="name, category"/>
             
             <x-button x-data x-on:click="$dispatch('open-create-modal')">
                 Add Product
@@ -12,7 +14,7 @@
             
             <!-- add modal -->
             <x-modals.create header="Create Product">
-                @livewire('product.create-product-form')     
+                <livewire:product.create-product-form />  
             </x-modals.create>
 
         </div>

@@ -20,10 +20,17 @@
 					<div>
 						<button type="button" class="flex text-sm bg-gray-800 rounded-full focus:ring-4 focus:ring-gray-300 dark:focus:ring-gray-600" aria-expanded="false" data-dropdown-toggle="dropdown-user">
 						<span class="sr-only">Open user menu</span>
+						@if($user->profile_image == null)
+						<img 
+							class="w-8 h-8 rounded-full"
+							alt="Profile Pic" 
+							src="{{ asset('storage/images/profiles/default-user.jpg') }} ">
+						@else
 						<img 
 							class="w-8 h-8 rounded-full"
 							alt="Profile Pic" 
 							src="{{ asset('storage/' . $user->profile_image) }} ">
+						@endif
 						</button>
 					</div>
 					<div class="z-50 hidden my-4 text-base list-none bg-white divide-y divide-gray-100 rounded-sm shadow-sm dark:bg-gray-700 dark:divide-gray-600" id="dropdown-user">
@@ -85,6 +92,14 @@
 		</li>
 		<li>
 			<x-sidebar-link href="/{{ $user->role }}/users">
+				<x-slot:icon>
+					<i class="ph ph-user"></i>
+				</x-slot:icon>
+				Users
+			</x-sidebar-link>
+		</li>
+		<li>
+			<x-sidebar-link href="/{{ $user->role }}/order">
 				<x-slot:icon>
 					<i class="ph ph-user"></i>
 				</x-slot:icon>

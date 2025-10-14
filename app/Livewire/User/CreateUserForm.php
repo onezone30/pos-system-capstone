@@ -47,7 +47,7 @@ class CreateUserForm extends Component
             'password' => Hash::make($this->password),
         ];
 
-        $userServices->createUser($userData);
+        $userServices->create($userData);
 
         $this->reset(['name', 'email', 'role', 'profile_image', 'password', 'password_confirmation']);
         $this->dispatch('close-create-modal');

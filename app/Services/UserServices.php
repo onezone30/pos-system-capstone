@@ -9,53 +9,62 @@ use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 
 class UserServices {
 
-    private function updateProfile(?TemporaryUploadedFile $file, ?string $oldPath = null) 
+    private function handleImage(?TemporaryUploadedFile $file, ?string $oldPath = null) 
     {
-        if($file) {
-
-            $imageName = time() . '_' . str_replace(' ', '_', $file->getClientOriginalName());
-            $imagePath = $file->storeAs('images/profiles', $imageName, 'public');
-
-            if($oldPath) {
-                Storage::disk('public')->delete($oldPath);
-            }
-
-            return $imagePath;
+        if(!$file) {
+            return $oldPath;
         }
-        
-        return $oldPath;
+
+        $imageName = time() . '_' . str_replace(' ', '_', $file->getClientOriginalName());
+        $imagePath = $file->storeAs('images/profiles', $imageName, 'public');
+
+        if($oldPath && $oldPath !== $imagePath) {
+            Storage::disk('public')->delete($oldPath);
+        }
+
+        return $imagePath;
     }
 
-    public function createUser(array $attributes) 
+    public function create(array $data) 
     {
         $userData = [
-            'name' => $attributes['name'],
-            'email' => $attributes['email'],
-            'profile_image' => $this->updateProfile($attributes['profile_image'] ?? null),
-            'role' => $attributes['role'],
-            'password' => bcrypt($attributes['password'])
+            'name' => $data['name'],
+            'email' => $data['email'],
+            'profile_image' => $this->handleImage($data['profile_image'] ?? null),
+            'role' => $data['role'],
+            'password' => bcrypt($data['password'])
         ];
 
         return User::create($userData);
     }
     
-    public function updateUser(User $user, array $attributes) {
+    public function update(User $user, array $data) {
+        
+        if(
+            isset($data['profile_image']) &&
+            $data['profile_image'] instanceof TemporaryUploadedFile
+            ) {
+                $profileImage = $this->handleImage($data['profile_image'], $user->profile_image);
+            }
+        else  {
+                $profileImage = $user->profile_image;
+            }
 
         $userData = [
-            'name' => $attributes['name'],
-            'email' => $attributes['email'],
-            'role' => $attributes['role'],
-            'profile_image' => $this->updateProfile($attributes['profile_image'] ?? null),
+            'name' => $data['name'],
+            'email' => $data['email'],
+            'role' => $data['role'],
+            'profile_image' => $profileImage,
         ];
 
-        if(!empty($attributes['password'])) {
-            $userData[] = bcrypt($attributes['password']);
+        if(!empty($data['password'])) {
+            $userData['password'] = bcrypt($data['password']);
         }
 
         return $user->update($userData);
     }
 
-    public function deleteUser(User $user)
+    public function delete(User $user)
     {
         return $user->delete();
     }

@@ -8,6 +8,7 @@ use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Password;
 use Livewire\Attributes\On;
 use Livewire\Component;
+use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 use Livewire\WithFileUploads;
 
 class EditUserForm extends Component
@@ -24,10 +25,11 @@ class EditUserForm extends Component
 
     public function rules()
     {
-        return [
+        $rules = [
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'email', Rule::unique('users', 'email')->ignore($this->user?->id)],
             'role' => ['required'],
+            'profile_image' => ['nullable', 'image', 'max:2048'],
             'password' => [
                 'nullable',
                 'confirmed',
@@ -36,30 +38,42 @@ class EditUserForm extends Component
                     ->numbers()
                 ]
             ];
+
+        if($this->profile_image instanceof TemporaryUploadedFile) {
+            $rules['profile_image'] = ['image', 'nullable', 'max:2048'];
+        }
+
+        return $rules;
     }
 
     #[On('open-edit-modal')]
-    public function mouth($id)
+    public function load($id)
     {
         $this->user = User::findOrFail($id);
 
         $this->name = $this->user->name;
         $this->email = $this->user->email;
         $this->role = $this->user->role;
-        $this->profile_image = $this->user->profile_image ?? null;
     }
 
     public function update(UserServices $userServices)
     {
         $this->validate();
 
-        $userServices->updateUser($this->user, [
+        $userData = [
             'name' => $this->name,
             'email' => $this->email,
             'role' => $this->role,
-            'profile_image' => $this->profile_image instanceof \Livewire\Features\SupportFileUploads\TemporaryUploadedFile ? $this->profile_image : null,
-            'password' => $this->password,
-        ]);
+            'profile_image' => $this->profile_image instanceof TemporaryUploadedFile
+                                ? $this->profile_image
+                                : $this->user->profile_image,
+        ];
+
+        $userServices->update($this->user, $userData);
+
+        $this->dispatch('editUser');
+        $this->reset();
+        $this->dispatch('close-edit-modal');
     }
 
     public function render()

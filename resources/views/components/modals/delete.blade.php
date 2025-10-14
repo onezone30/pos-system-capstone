@@ -51,7 +51,7 @@
             </x-button>
 
             <x-button 
-                color="red" 
+                color="gray" 
                 @click="open = false" 
                 wire:target="delete">
                 Cancel

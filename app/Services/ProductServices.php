@@ -13,38 +13,66 @@ use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 
 class ProductServices {
 
-    private function updateProfile(?TemporaryUploadedFile $file, ?string $oldPath = null)
+    private function handleImage(?TemporaryUploadedFile $file, ?string $oldPath = null) 
     {
-        if($file) {
+        if(!$file) {
+            return $oldPath;
+        }
 
-            $imageName = time() . '_' . str_replace(' ', '_', $file->getClientOriginalName());
-            $imagePath = $file->storeAs('images/products', $imageName, 'public');
+        $imageName = time() . '_' . str_replace(' ', '_', $file->getClientOriginalName());
+        $imagePath = $file->storeAs('images/products', $imageName, 'public');
 
-            if($oldPath) {
-                Storage::disk('public')->delete($oldPath);
-            }
+        if($oldPath && $oldPath !== $imagePath) {
+            Storage::disk('public')->delete($oldPath);
         }
 
         return $imagePath;
-
     }
 
     public function create(array $data) 
     {
-        $product = Product::create([
+        $productData = [
             'name' => $data['name'],
             'category_id' => $data['category_id'],
-            'product_image' => $data['product_image'] /* $this->updateProfile($data['product_image']) ?? null */
-        ]);
+            'product_image' => $this->handleImage($data['product_image'] ?? null)
+        ];
+
+
+        $product = Product::create($productData);
 
         foreach ($data['sizes'] as $index => $size) {
-            ProductPrices::create([
+            $pricesData = [
                 'product_id' => $product->id,
                 'price' => $data['prices'][$index] ?? null,
                 'quantity_stock' => $data['quantities'][$index] ?? null,
                 'size' => $size,
-            ]);
+            ];
+
+            ProductPrices::create($pricesData);
         }
+
+        return $product;
+    }
+
+    public function update(Product $product, array $data) {
+
+        $productData = [
+            'name' => $data['name'],
+            'category_id' => $data['category_id'],
+            'product_image' => $data['product_image'],
+        ];
+
+        foreach($data['sizes'] as $index => $size) {
+            $pricesData = [
+                'product_id' => $productData['id'],
+                'price' => $data['prices'][$index] ?? null,
+                'quantity_stock' => $data['quantities'][$index] ?? null,
+                'size' => $size,
+            ];
+            $product->prices->update($pricesData);
+        }
+
+        return $product->update($productData);
     }
 
     private function syncPrices(object $product, array $priceRequest) {
@@ -77,7 +105,7 @@ class ProductServices {
             [
                 'name' => $productData['name'],
                 'category_id' => $productData['category_id'],
-                'product_image' => $this->updateProfile($productData['product_image']) ?? $product->proudct_image
+                'product_image' => $this->handleImage($productData['product_image']) ?? $product->proudct_image
             ]
         );
 

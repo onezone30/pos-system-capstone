@@ -48,16 +48,15 @@
                 </div>
             @endforeach
 
-            <x-forms.input 
-                wire:model="product_image"
-                label="Product Image"
-                type="file"/>
+            <x-forms.file 
+                label="Profile Picture"
+                wire:model="product_image"/>
 
             <!-- Edit Button -->
             <div class="flex justify-end mt-4">
-                <x-forms.button>
-                    Edit Product
-                </x-forms.button>
+                 <x-button size="2xl" color="blue" wire:click="create" wire:target="create">
+                    Create Product
+                </x-button>
             </div>
         </div>
     </form>

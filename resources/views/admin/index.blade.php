@@ -1,4 +1,4 @@
-<x-main :user="$user">
+<x-main>
 
         <p>{{ $user->id }}</p>
         <p>{{ $user->name }}</p>
