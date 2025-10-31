@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Category;
 
+use App\Models\Category;
 use App\Services\CategoryServices;
 use Livewire\Component;
 
@@ -31,6 +32,7 @@ class CreateCategoryForm extends Component
 
         $this->dispatch('close-create-modal');
         $this->dispatch('createCategory');
+        $this->dispatch('toast.success', message: "{$this->name} category has been created");
         $this->reset();
     }
 
