@@ -75,7 +75,7 @@ class CreateProductForm extends Component
 
         $this->dispatch('toast.success', message: "{$productData['name']} has been created");
 
-        $this->dispatch('createProduct');
+        $this->dispatch( 'createProduct');
         $this->resetForm();
         $this->dispatch('close-create-modal');
     }
