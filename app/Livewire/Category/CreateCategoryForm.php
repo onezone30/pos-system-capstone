@@ -13,8 +13,8 @@ class CreateCategoryForm extends Component
     public function rules()
     {
         return [
-            'name' => ['required', 'string'],
-            'description' => ['nullable', 'string']
+            'name' => ['required', 'string', 'max:255', 'unique:categories,name'],
+            'description' => ['nullable', 'string', 'max:255']
         ];
     }
 
@@ -27,7 +27,7 @@ class CreateCategoryForm extends Component
             'description' => $this->description,
         ];
 
-        $service->createCategory($categoryData);
+        $service->create($categoryData);
 
         $this->dispatch('close-create-modal');
         $this->dispatch('createCategory');
