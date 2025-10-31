@@ -2,12 +2,6 @@
     x-data="{ open: false }"
     x-show="open"
     x-cloak
-    x-transition:enter="transition ease-out duration-500"
-    x-transition:enter-start="opacity-0 -translate-y-10"
-    x-transition:enter-end="opacity-100 translate-y-0"
-    x-transition:leave="transition ease-in duration-300"
-    x-transition:leave-start="opacity-100 translate-y-0"
-    x-transition:leave-end="opacity-0 -translate-y-10"
     x-on:open-edit-modal.window="open = true"
     x-on:close-edit-modal.window="open = false"
 >
@@ -31,31 +25,65 @@
                 @endforeach
             </x-forms.select>
 
-            <!-- Sizes -->
             @foreach ($sizes as $index => $size)
-                <h1 class="font-bold text-base">
+                <h1 class="text-xl">
                     {{ ucfirst($size) }} Size
                 </h1>
                 <div class="grid grid-cols-2 gap-4">
-                    {{-- Price --}}
                     <x-forms.input 
                         wire:model="prices.{{ $index }}"
                         placeholder="Enter price"/>
-                    {{-- Quantity --}}
                     <x-forms.input 
                         wire:model="quantities.{{ $index }}"
                         placeholder="Enter quantity stock"/>
                 </div>
             @endforeach
-
+            
             <x-forms.file 
+                accept="image/*"
                 label="Profile Picture"
                 wire:model="product_image"/>
 
+            @if ($product_image && !$product_image instanceof \Livewire\Features\SupportFileUploads\TemporaryUploadedFile)
+                <div class="flex items-center justify-center gap-4">
+                    <img 
+                        src="{{ asset('storage/' . $product_image) }}" 
+                        alt="Product Image"
+                        class="max-h-48 rounded-lg object-cover border"
+                    >
+
+                    <x-button 
+                        size="sm" 
+                        color="red" 
+                        wire:click="removeProductImage"
+                        wire:loading.attr="disabled"
+                    >
+                        Remove
+                    </x-button>
+                </div>
+            @endif
+
+            @if ($product_image instanceof \Livewire\Features\SupportFileUploads\TemporaryUploadedFile)
+                <div class="flex items-center gap-4">
+                    <img 
+                        src="{{ $product_image->temporaryUrl() }}" 
+                        alt="Preview" 
+                        class="max-h-48 rounded-lg object-cover border"
+                    >
+                    <x-button 
+                        size="sm" 
+                        color="red" 
+                        wire:click="$set('product_image', null)"
+                    >
+                        Cancel Upload
+                    </x-button>
+                </div>
+            @endif
+
             <!-- Edit Button -->
             <div class="flex justify-end mt-4">
-                 <x-button size="2xl" color="blue" wire:click="create" wire:target="create">
-                    Create Product
+                 <x-button size="2xl" color="blue" wire:click="update" wire:target="update">
+                    Update Product
                 </x-button>
             </div>
         </div>
