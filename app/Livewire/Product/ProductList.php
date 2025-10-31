@@ -8,44 +8,70 @@ use Livewire\Component;
 
 class ProductList extends Component
 {
+    public $products = [];
+
     public string $search = "";
     protected $listeners = [
-        'createProduct' => '$refresh',
-        'deleteProduct' => '$refresh',
-        'editProduct' => '$refresh',
+        'createProduct' => 'load',
+        'editProduct' => 'load',
         'searchUpdated' => 'productSearch'
     ];
+
+    public function mount()
+    {
+        $this->load();
+    }
+
+    public function load()
+    {
+        $this->products = $this->filteredProduct();
+    }
 
     public function productSearch($search)
     {
         $this->search = trim($search);
+        $this->load();
     }
 
-    public function delete(int $id)
-    {
-        Product::findOrFail($id)->delete();
-
-        $this->dispatch('success-delete');
-    }
-
-    public function render()
+    public function filteredProduct()
     {
         $products = Product::query()
             ->when($this->search, function($query) {
-                $query->where('name', 'like', "%{$this->search}%")
-                    ->orWhereHas('category', function($q) {
-                        $q->where('name', 'like', "%{$this->search}%");
-                    });
+                $search = "%{$this->search}%";
+                $query->where(function ($q) use ($search) {
+                    $q->where('name', 'like', $search)
+                        ->orWhereHas('category', function ($cat) use ($search) {
+                            $cat->where('name', 'like', $search);
+                        });
+                });
             })
             ->with('category')
             ->latest()
             ->get();
-            
+
+        return $products;
+    }
+
+    public function delete(int $id)
+    {
+        $product = Product::findOrFail($id);
+        
+        if(! $product->delete()) {
+            $this->dispatch('toast.success', message: "Failed to delete {$product->name}");
+        }
+
+        $this->load();
+        $this->dispatch('toast.success', message: "{$product->name} has been deleted");
+        $this->dispatch('close-delete-modal');
+    }
+
+    public function render()
+    {            
         $categories = Category::query()
             ->get();
 
         return view('livewire.product.product-list', [
-            'products' => $products,
+            'products' => $this->products,
             'categories' => $categories
         ]);
     }

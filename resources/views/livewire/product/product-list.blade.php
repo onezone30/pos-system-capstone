@@ -11,11 +11,11 @@
 
     <!-- rendering modals -->
     <!-- Edit Modal -->
-    <x-modals.edit action="edit">
+    <x-modals.edit>
         <livewire:product.edit-product-form />
     </x-modals.edit>
     <!-- Delete Modal -->
-    <x-modals.delete action="delete" />
+    <x-modals.delete />
 
 
 </div>
