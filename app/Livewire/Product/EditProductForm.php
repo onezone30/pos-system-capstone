@@ -83,7 +83,6 @@ class EditProductForm extends Component
             Storage::delete('public/' . $this->product->product_image);
         }
 
-        $this->product->update(['product_image' => null]);
         $this->product_image = null;
         $this->dispatch('toast.success', message: 'Product image removed');
     }
@@ -95,9 +94,7 @@ class EditProductForm extends Component
         $data = [
             'name'          => $validated['name'],
             'category_id'   => $validated['category_id'],
-            'product_image' => $this->product_image instanceof \Livewire\Features\SupportFileUploads\TemporaryUploadedFile
-                                ? $this->product_image
-                                : $this->product->product_image,
+            'product_image' => $this->product_image,
             'prices' => collect($this->sizes)->map(function ($size, $index) {
                 return [
                     'size'           => $size,

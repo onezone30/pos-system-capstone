@@ -61,10 +61,8 @@
                         Remove
                     </x-button>
                 </div>
-            @endif
-
-            @if ($product_image instanceof \Livewire\Features\SupportFileUploads\TemporaryUploadedFile)
-                <div class="flex items-center gap-4">
+            @elseif ($product_image instanceof \Livewire\Features\SupportFileUploads\TemporaryUploadedFile)
+                <div class="flex items-center justify-center gap-4">
                     <img 
                         src="{{ $product_image->temporaryUrl() }}" 
                         alt="Preview" 
@@ -73,9 +71,9 @@
                     <x-button 
                         size="sm" 
                         color="red" 
-                        wire:click="$set('product_image', null)"
+                        wire:click="removeProductImage"
                     >
-                        Cancel Upload
+                        Remove
                     </x-button>
                 </div>
             @endif
