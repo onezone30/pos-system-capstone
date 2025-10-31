@@ -16,9 +16,19 @@
         <!-- Image Container with Overlay -->
         <div class="relative overflow-hidden">
             <div class="aspect-square p-6 bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-700 dark:to-gray-800">
-                <img class="w-full h-full object-cover rounded-xl group-hover:scale-105 transition-transform duration-300" 
-                    src="{{ asset('storage/' . $product->product_image) }}" 
-                    alt="{{ $product->name }}" />
+            @if ($product->product_image === null)
+                <img 
+                    class="w-full h-full object-cover rounded-xl group-hover:scale-105 transition-transform duration-300"
+                    src="{{ asset('storage/images/products/default.png') }}"
+                    alt="{{ $product->name }}" 
+                />
+            @else
+                <img 
+                    class="w-full h-full object-cover rounded-xl group-hover:scale-105 transition-transform duration-300"
+                    src="{{ asset('storage/' . $product->product_image) }}"
+                    alt="{{ $product->name }}" 
+                />
+            @endif
             </div>
             
             <!-- Floating Badge -->
@@ -28,10 +38,10 @@
         </div>
 
         <!-- Content Section -->
-        <div class="flex flex-col flex-1 p-6">
+        <div class="flex flex-col h-full p-6">
             
             <!-- Product Name -->
-            <h5 class="mb-3 text-xl font-bold text-center text-gray-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors duration-200">
+            <h5 class="mb-3 text-xl font-bold text-center text-gray-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors duration-200 whitespace-nowrap overflow-hidden text-ellipsis">
                 {{ $product->name }}
             </h5>
 
@@ -88,18 +98,26 @@
                 @if($product->prices && $product->prices->count() > 0)
                     <div class="space-y-2">
                         @foreach ($product->prices as $price)
-
                             @if ($price->quantity_stock !== 0)
                                 <div class="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors duration-200">
                                     <span class="font-medium text-gray-700 dark:text-gray-300 capitalize">
                                         {{ $price->size }}
                                     </span>
-                                    <span class="font-bold text-lg text-indigo-600 dark:text-indigo-400">
+                                    @if($price->quantity_stock < 20)
+                                    <span class="font-bold text-lg text-red-600 dark:text-red-400">
                                         {{ number_format($price->quantity_stock) }}
                                     </span>
+                                    @elseif ($price->quantity_stock < 40)
+                                    <span class="font-bold text-lg text-yellow-600 dark:text-yellow-400">
+                                        {{ number_format($price->quantity_stock) }}
+                                    </span>
+                                    @else
+                                    <span class="font-bold text-lg text-green-600 dark:text-green-400">
+                                        {{ number_format($price->quantity_stock) }}
+                                    </span>
+                                    @endif
                                 </div>
                             @endif
-                        
                         @endforeach
                     </div>
                 @else
@@ -109,20 +127,21 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"></path>
                             </svg>
                         </div>
-                        <p class="text-sm text-gray-500 dark:text-gray-400 italic">No prices available</p>
+                        <p class="text-sm text-gray-500 dark:text-gray-400 italic">
+                            No quantity stock
+                        </p>
                     </div>
                 @endif
             </div>
 
             <!-- Action Buttons -->
-            <div class="flex gap-3">
+            <div class="flex gap-3 mt-auto pt-4">
 
                 <!-- edit -->
                 <button 
                     @click="$dispatch('open-edit-modal', {id: {{ $product->id }}, name: '{{ $product->name }}'})"
                     class="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2.5 px-4 rounded-lg transition-colors duration-200 flex items-center justify-center gap-2 group">
 
-                    <!-- icon -->
                     <svg class="w-4 h-4 group-hover:rotate-12 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
                     </svg>
@@ -145,6 +164,7 @@
                     
                 </button>
             </div>
+
         </div>
 
         <!-- Subtle gradient overlay for extra depth -->
