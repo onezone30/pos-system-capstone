@@ -41,10 +41,13 @@ class ProductServices {
         $product = Product::create($productData);
 
         foreach ($data['sizes'] as $index => $size) {
+            $price = trim((string)($data['prices'][$index] ?? ''));
+            $quantity = trim((string)($data['quantities'][$index] ?? ''));
+
             $pricesData = [
                 'product_id' => $product->id,
-                'price' => $data['prices'][$index] ?? null,
-                'quantity_stock' => $data['quantities'][$index] ?? null,
+                'price' => $price === '' ? null : (float) $price,
+                'quantity_stock' => $quantity === '' ? null : (float) $quantity,
                 'size' => $size,
             ];
 
@@ -56,23 +59,36 @@ class ProductServices {
 
     public function update(Product $product, array $data) {
 
+        if(
+            isset($data['product_image']) &&
+            $data['product_image'] instanceof TemporaryUploadedFile
+            ) {
+                $product_image = $this->handleImage($data['product_image'], $product->product_image);
+            }
+        else  {
+                $product_image = null;
+            }
+
+
         $productData = [
             'name' => $data['name'],
             'category_id' => $data['category_id'],
-            'product_image' => $data['product_image'],
+            'product_image' => $product_image,
         ];
+        
+        $product->update($productData);
 
-        foreach($data['sizes'] as $index => $size) {
-            $pricesData = [
-                'product_id' => $productData['id'],
-                'price' => $data['prices'][$index] ?? null,
-                'quantity_stock' => $data['quantities'][$index] ?? null,
-                'size' => $size,
-            ];
-            $product->prices->update($pricesData);
+        foreach($data['prices'] as $priceData) {
+            $product->prices()->updateOrCreate(
+                ['size' => $priceData['size']],
+                [
+                    'price'          => $priceData['price'] ?? null,
+                    'quantity_stock' => $priceData['quantity_stock'] ?? null,
+                ]
+            );
         }
 
-        return $product->update($productData);
+        return $product;
     }
 
     private function syncPrices(object $product, array $priceRequest) {
