@@ -69,11 +69,14 @@ class EditUserForm extends Component
                                 : $this->user->profile_image,
         ];
 
-        $userServices->update($this->user, $userData);
+        if(! $userServices->update($this->user, $userData)) {
+            $this->dispatch('toast.error', message: "Failed to update {$userData['name']}");
+        }
 
         $this->dispatch('editUser');
         $this->reset();
         $this->dispatch('close-edit-modal');
+        $this->dispatch('toast.success', message: "{$userData['name']} has been updated");
     }
 
     public function render()
