@@ -2,12 +2,7 @@
     x-data="{ open: false }"
     x-show="open"
     x-cloak
-    x-transition:enter="transition ease-out duration-500"
-    x-transition:enter-start="opacity-0 -translate-y-10"
-    x-transition:enter-end="opacity-100 translate-y-0"
-    x-transition:leave="transition ease-in duration-300"
-    x-transition:leave-start="opacity-100 translate-y-0"
-    x-transition:leave-end="opacity-0 -translate-y-10"
+    x-transition
     x-on:open-create-modal.window="open = true"
     x-on:close-create-modal.window="open = false"
 >
@@ -40,17 +35,55 @@
                 wire:model="profile_image"
             />
 
-            <x-forms.password 
+            @if ($profile_image && !$profile_image instanceof \Livewire\Features\SupportFileUploads\TemporaryUploadedFile)
+                <div class="flex items-center justify-center gap-4">
+                    <img 
+                        src="{{ asset('storage/' . $profile_image) }}" 
+                        alt="Product Image"
+                        class="max-h-48 rounded-lg object-cover border"
+                    >
+
+                    <x-button 
+                        size="sm" 
+                        color="red" 
+                        wire:click="removeProfileImage"
+                        wire:loading.attr="disabled"
+                    >
+                        Remove
+                    </x-button>
+                </div>
+            @endif
+
+            @if ($profile_image instanceof \Livewire\Features\SupportFileUploads\TemporaryUploadedFile)
+                <div class="flex items-center justify-center gap-4">
+                    <img 
+                        src="{{ $profile_image->temporaryUrl() }}" 
+                        alt="Preview" 
+                        class="max-h-48 rounded-lg object-cover border"
+                    >
+                    <x-button 
+                        size="sm" 
+                        color="red" 
+                        wire:click="$set('profile_image', null)"
+                    >
+                        Remove
+                    </x-button>
+                </div>
+            @endif
+
+            <x-forms.input
+                type="password"
                 wire:model="password"
                 name="password"
                 placeholder="Enter password"
-                label="Password"/>
-            
-            <x-forms.password 
+                label="Password" />
+
+            <x-forms.input
+                type="password"
                 wire:model="password_confirmation"
                 name="password_confirmation"
                 placeholder="Enter confirm password"
-                label="Confirm Password"/>
+                label="Confirm Password" />
 
 
             <!-- Create Button -->

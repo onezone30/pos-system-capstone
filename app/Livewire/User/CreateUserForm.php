@@ -31,7 +31,8 @@ class CreateUserForm extends Component
                 Password::min(8)
                     ->letters()
                     ->numbers()
-                ]
+            ],
+            'profile_image' => ['nullable', 'image', 'max:2048', 'mimes:jpeg,jpg,png,webp'],
             ];
     }
 
@@ -47,11 +48,15 @@ class CreateUserForm extends Component
             'password' => Hash::make($this->password),
         ];
 
-        $userServices->create($userData);
+        if(! $userServices->create($userData)) {
+            $this->dispatch('toast.error', message: "Failed to create user");
+            return;
+        }
 
         $this->reset(['name', 'email', 'role', 'profile_image', 'password', 'password_confirmation']);
         $this->dispatch('close-create-modal');
         $this->dispatch('createUser');
+        $this->dispatch('toast.success', message: "{$userData['name']} has been created");
     }
 
     public function render()
