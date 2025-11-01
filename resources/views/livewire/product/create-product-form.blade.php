@@ -64,7 +64,7 @@
             @endif
 
             @if ($product_image instanceof \Livewire\Features\SupportFileUploads\TemporaryUploadedFile)
-                <div class="flex items-center gap-4">
+                <div class="flex items-center justify-center gap-4">
                     <img 
                         src="{{ $product_image->temporaryUrl() }}" 
                         alt="Preview" 

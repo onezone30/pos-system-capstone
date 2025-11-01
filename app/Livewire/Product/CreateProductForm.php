@@ -71,7 +71,10 @@ class CreateProductForm extends Component
         ];
 
         
-        $service->create($productData);
+        if(!$service->create($productData)) {
+            $this->dispatch('toast.error', message: 'Failed to create product');
+            return;
+        }
 
         $this->dispatch('toast.success', message: "{$productData['name']} has been created");
 
