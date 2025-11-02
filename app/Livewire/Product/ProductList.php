@@ -5,27 +5,19 @@ namespace App\Livewire\Product;
 use App\Models\Category;
 use App\Models\Product;
 use Livewire\Component;
+use Livewire\WithPagination;
 
 class ProductList extends Component
 {
-    public $products = [];
+    use WithPagination;
+
 
     public string $search = "";
     protected $listeners = [
-        'createProduct' => 'load',
-        'editProduct' => 'load',
+        'createProduct' => 'updatingSearch',
+        'editProduct' => 'updatingSearch',
         'searchUpdated' => 'productSearch'
     ];
-
-    public function mount()
-    {
-        $this->load();
-    }
-
-    public function load()
-    {
-        $this->products = $this->filteredProduct();
-    }
 
     public function productSearch($search)
     {
@@ -33,9 +25,14 @@ class ProductList extends Component
         $this->load();
     }
 
+    public function updatingSearch()
+    {
+        $this->resetPage();
+    }
+
     public function filteredProduct()
     {
-        $products = Product::query()
+        return Product::query()
             ->when($this->search, function($query) {
                 $search = "%{$this->search}%";
                 $query->where(function ($q) use ($search) {
@@ -47,9 +44,8 @@ class ProductList extends Component
             })
             ->with('category')
             ->latest()
-            ->get();
+            ->paginate(10);
 
-        return $products;
     }
 
     public function delete(int $id)
@@ -60,7 +56,7 @@ class ProductList extends Component
             $this->dispatch('toast.success', message: "Failed to delete {$product->name}");
         }
 
-        $this->load();
+        $this->updatingSearch();
         $this->dispatch('toast.success', message: "{$product->name} has been deleted");
         $this->dispatch('close-delete-modal');
     }
@@ -71,7 +67,7 @@ class ProductList extends Component
             ->get();
 
         return view('livewire.product.product-list', [
-            'products' => $this->products,
+            'products' => $this->filteredProduct(),
             'categories' => $categories
         ]);
     }

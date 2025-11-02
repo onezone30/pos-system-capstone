@@ -24,9 +24,6 @@
             <livewire:product.product-list/>
 
         </x-section>
-        
-
-
 </x-main>
 
 
