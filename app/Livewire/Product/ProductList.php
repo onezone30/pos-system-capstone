@@ -4,6 +4,7 @@ namespace App\Livewire\Product;
 
 use App\Models\Category;
 use App\Models\Product;
+use Livewire\Attributes\On;
 use Livewire\Component;
 use Livewire\WithPagination;
 
@@ -11,17 +12,7 @@ class ProductList extends Component
 {
     use WithPagination;
 
-    public ?string $sortCategory = null;
-    public string $sortOrder = 'asc';
-    public string $sortField = 'name';
-
     public string $search = "";
-    protected $listeners = [
-        'createProduct' => 'updatingSearch',
-        'editProduct' => 'updatingSearch',
-        'searchUpdated' => 'productSearch',
-        'sortProduct' => 'sort',
-    ];
 
     public function productSearch($search)
     {
@@ -29,14 +20,7 @@ class ProductList extends Component
         $this->resetPage();
     }
 
-    public function sort($sortData)
-    {
-        $this->sortCategory = $sortData['category'] ?? null;
-        $this->sortField = $sortData['field'] ?? 'name';
-        $this->sortOrder = $sortData['order'] ?? 'asc';
-        $this->resetPage();
-    }
-
+    #[On('editProduct', 'createProduct')]
     public function updatingSearch()
     {
         $this->resetPage();
@@ -44,19 +28,14 @@ class ProductList extends Component
 
     public function filteredProduct()
     {
-        return Product::query()
-            ->when($this->sortCategory, fn($query) => $query->where('category_id', $this->sortCategory))
+          return Product::query()
             ->when($this->search, function($query) {
-                $search = "%{$this->search}%";
-                $query->where(function ($q) use ($search) {
-                    $q->where('name', 'like', $search)
-                        ->orWhereHas('category', function ($cat) use ($search) {
-                            $cat->where('name', 'like', $search);
-                        });
-                });
+                $query->where('name', 'like', "%{$this->search}%")
+                    ->orWhereHas('category', function($q) {
+                        $q->where('name', 'like', "%{$this->search}%");
+                    });
             })
             ->with('category')
-            ->orderBy($this->sortField, $this->sortOrder)
             ->paginate(10);
     }
 
