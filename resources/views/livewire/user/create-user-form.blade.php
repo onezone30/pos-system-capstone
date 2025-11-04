@@ -71,15 +71,13 @@
                 </div>
             @endif
 
-            <x-forms.input
-                type="password"
+            <x-forms.password
                 wire:model="password"
                 name="password"
                 placeholder="Enter password"
                 label="Password" />
 
-            <x-forms.input
-                type="password"
+            <x-forms.password
                 wire:model="password_confirmation"
                 name="password_confirmation"
                 placeholder="Enter confirm password"
