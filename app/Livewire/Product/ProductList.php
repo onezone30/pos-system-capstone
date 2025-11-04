@@ -11,18 +11,30 @@ class ProductList extends Component
 {
     use WithPagination;
 
+    public ?string $sortCategory = null;
+    public string $sortOrder = 'asc';
+    public string $sortField = 'name';
 
     public string $search = "";
     protected $listeners = [
         'createProduct' => 'updatingSearch',
         'editProduct' => 'updatingSearch',
-        'searchUpdated' => 'productSearch'
+        'searchUpdated' => 'productSearch',
+        'sortProduct' => 'sort',
     ];
 
     public function productSearch($search)
     {
         $this->search = trim($search);
-        $this->load();
+        $this->resetPage();
+    }
+
+    public function sort($sortData)
+    {
+        $this->sortCategory = $sortData['category'] ?? null;
+        $this->sortField = $sortData['field'] ?? 'name';
+        $this->sortOrder = $sortData['order'] ?? 'asc';
+        $this->resetPage();
     }
 
     public function updatingSearch()
@@ -33,6 +45,7 @@ class ProductList extends Component
     public function filteredProduct()
     {
         return Product::query()
+            ->when($this->sortCategory, fn($query) => $query->where('category_id', $this->sortCategory))
             ->when($this->search, function($query) {
                 $search = "%{$this->search}%";
                 $query->where(function ($q) use ($search) {
@@ -43,9 +56,8 @@ class ProductList extends Component
                 });
             })
             ->with('category')
-            ->latest()
+            ->orderBy($this->sortField, $this->sortOrder)
             ->paginate(10);
-
     }
 
     public function delete(int $id)
