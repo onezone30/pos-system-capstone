@@ -2,7 +2,7 @@
     'name' => 'password',
     'label' => 'Password',
     'placeholder' => 'Enter your password',
-    'class' => 'w-full px-6 py-4 bg-white text-black rounded-md',
+    'class' => 'py-5 px-3 bg-white-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500',
 ])
 
 @php
@@ -17,6 +17,7 @@
     <div class="relative w-full">
         <input
             {{ $attributes }}
+            id="password-input-{{ $name }}"
             type="password"
             name="{{ $name }}"
             class="{{ $class }} pr-12"

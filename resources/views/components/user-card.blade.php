@@ -21,7 +21,7 @@
                 @if($card_user->profile_image == null)
                     <img 
                         class="h-32 w-32 rounded-full border-4 border-white dark:border-gray-800 mx-auto my-4"
-                        src="{{ asset('storage/images/profiles/default-user.jpg') }}" 
+                        src="{{ asset('storage/images/profiles/default.jpg') }}" 
                         alt="{{ $card_user->name }}">
                 @else
                     <img 

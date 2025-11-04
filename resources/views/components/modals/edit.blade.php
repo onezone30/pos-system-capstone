@@ -1,5 +1,3 @@
-@props(['action'])
-
 <!-- Main modal -->
 <div 
     x-data="{ open: false, id: null, name: '' }"
@@ -11,6 +9,7 @@
     x-on:close-edit-modal.window="open = false"
     x-show="open"
     x-cloak
+    x-transition
     wire:ignore.self
     class="fixed inset-0 z-50 overflow-y-auto overflow-x-hidden"
 >
@@ -24,8 +23,8 @@
             <div class="px-4 py-2 relative bg-white rounded-lg shadow-lg dark:bg-gray-700">
                 <!-- Modal header -->
                 <div class="flex items-center justify-between p-4 md:p-5 border-b rounded-t dark:border-gray-600 border-gray-200">
-                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
-                        Edit for <b x-text="name"></b>
+                    <h3 class="text-3xl font-semibold text-gray-900 dark:text-white">
+                        Edit
                     </h3>
                     <button 
                         type="button" 

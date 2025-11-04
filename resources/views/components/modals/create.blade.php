@@ -5,6 +5,7 @@
     x-data="{ open: false }"
     x-show="open"
     x-cloak
+    x-transition
     x-on:open-create-modal.window="open = true"
     x-on:close-create-modal.window="open = false"
     x-on:createProduct.window="open = false"
@@ -21,7 +22,7 @@
             <div class="px-4 py-2 relative bg-white rounded-lg shadow-lg dark:bg-gray-700">
                 <!-- Modal header -->
                 <div class="flex items-center justify-between p-4 md:p-5 border-b rounded-t dark:border-gray-600 border-gray-200">
-                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
+                    <h3 class="text-3xl font-semibold text-gray-900 dark:text-white">
                         {{ $header }}
                     </h3>
                     <button 

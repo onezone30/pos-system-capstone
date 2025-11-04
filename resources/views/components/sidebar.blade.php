@@ -24,7 +24,7 @@
 						<img 
 							class="w-8 h-8 rounded-full"
 							alt="Profile Pic" 
-							src="{{ asset('storage/images/profiles/default-user.jpg') }} ">
+							src="{{ asset('storage/images/profiles/default.jpg') }} ">
 						@else
 						<img 
 							class="w-8 h-8 rounded-full"
@@ -67,7 +67,7 @@
 <div class="h-full px-3 pb-4 overflow-y-auto bg-white dark:bg-gray-800">
 	<ul class="space-y-2 font-medium">
 		<li>
-			<x-sidebar-link href="/{{ $user->role }}/dashboard">
+			<x-sidebar-link wire:navigate href="/{{ $user->role }}/dashboard">
 				<x-slot:icon>
 					<i class="ph ph-house"></i>
 				</x-slot:icon>
@@ -75,7 +75,7 @@
 			</x-sidebar-link>
 		</li>
 		<li>
-			<x-sidebar-link href="/{{ $user->role }}/products">
+			<x-sidebar-link wire:navigate href="/{{ $user->role }}/products">
 				<x-slot:icon>
 					<i class="ph ph-bag"></i>
 				</x-slot:icon>
@@ -83,7 +83,7 @@
 			</x-sidebar-link>
 		</li>
 		<li>
-			<x-sidebar-link href="/{{ $user->role }}/categories">
+			<x-sidebar-link wire:navigate href="/{{ $user->role }}/categories">
 				<x-slot:icon>
 					<i class="ph ph-browsers"></i>
 				</x-slot:icon>
@@ -91,7 +91,7 @@
 			</x-sidebar-link>
 		</li>
 		<li>
-			<x-sidebar-link href="/{{ $user->role }}/users">
+			<x-sidebar-link wire:navigate href="/{{ $user->role }}/users">
 				<x-slot:icon>
 					<i class="ph ph-user"></i>
 				</x-slot:icon>
@@ -99,15 +99,22 @@
 			</x-sidebar-link>
 		</li>
 		<li>
-			<x-sidebar-link href="/{{ $user->role }}/order">
+			<x-sidebar-link wire:navigate href="/{{ $user->role }}/orders/create">
 				<x-slot:icon>
-					<i class="ph ph-user"></i>
+					<i class="ph ph-list"></i>
 				</x-slot:icon>
-				Users
+				Create Order
+			</x-sidebar-link>
+		</li>
+		<li>
+			<x-sidebar-link wire:navigate href="/{{ $user->role }}/orders">
+				<x-slot:icon>
+					<i class="ph ph-clipboard-text"></i>
+				</x-slot:icon>
+				Orders
 			</x-sidebar-link>
 		</li>
 
 	</ul>
 </div>
 </aside>
-

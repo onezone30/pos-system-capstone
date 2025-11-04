@@ -1,28 +1,19 @@
 @props([
-    'name' => null, 
+    'name' => null,
     'label' => false,
     'type' => 'text',
-    'placeholder' => false,
-    'class' => 'w-full px-6 py-4 bg-white text-black rounded-md',
-    ])
-
+    'class' => 'bg-white-50 border border-gray-300 text-gray-900 text-medium px-3 py-5 rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500',
+])
 
 @php
-
     $model = $attributes->get('wire:model') ?? $name;
-
     $error = $errors->first($model);
-
 @endphp
 
 <x-forms.field :label="$label" :name="$model">
-
-        <input 
-            label="{{ $label }}"
-            type="{{ $type }}" 
-            name="{{ $name }}" 
-            placeholder="{{ $placeholder }}"
-            {{ $attributes->merge(['class' => $class]) }}/>
-    
-
+    <input 
+        name="{{ $name }}" 
+        type="{{ $type }}" 
+        {{ $attributes->merge(['class' => $class]) }}
+    />
 </x-forms.field>
