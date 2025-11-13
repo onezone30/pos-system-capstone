@@ -77,55 +77,60 @@ Route::middleware(['auth', 'role:customer'])->prefix('customer')->group(function
 
 
 // admin
-Route::middleware(['auth', 'role:admin'])->prefix('admin')->group(function() {
+Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function() {
     Route::get('/dashboard', [AdminController::class, 'dashboard'])
-        ->name('admin.dashboard');
+        ->name('dashboard');
 
     // products
     Route::get('/products', [ProductController::class, 'index'])
-        ->name('admin.products'); 
+        ->name('products'); 
     Route::post('/products', [ProductController::class, 'store'])
-        ->name('admin.products.store');
+        ->name('products.store');
     Route::patch('/products/{product}', [ProductController::class, 'update'])
-        ->name('admin.products.update');
+        ->name('products.update');
     Route::delete('/products/{product}', [ProductController::class, 'destroy'])
-        ->name('admin.products.destroy');
+        ->name('products.destroy');
 
 
     // users
     Route::get('/users', [UserController::class, 'index'])
-        ->name('admin.users');
+        ->name('users');
     Route::post('/users', [UserController::class, 'store']);
     Route::patch('/users/{user}', [UserController::class, 'update'])
-        ->name('admin.users.update');
+        ->name('users.update');
     Route::delete('/users/{user}', [UserController::class, 'destroy'])
-        ->name('admin.users.destroy');
-    Route::get('/users', SearchController::class)
-        ->name('admin.users.search');
+        ->name('users.destroy');
+    // Route::get('/users', SearchController::class)
+    //     ->name('users.search');
 
     // categories
     Route::get('/categories', [CategoryController::class, 'index'])
-        ->name('admin.categories');
+        ->name('categories');
     Route::post('/categories', [CategoryController::class, 'store'])
-        ->name('admin.categories.store');
+        ->name('categories.store');
     Route::patch('/categories/{category}', [CategoryController::class, 'update'])
-        ->name('admin.categories.update');
+        ->name('categories.update');
     Route::delete('/categories/{category}', [CategoryController::class, 'destroy'])
-        ->name('admin.categories.destroy');
+        ->name('categories.destroy');
 
     // orders
     Route::get('/orders', [OrderController::class, 'index'])
-        ->name('admin.orders');
+        ->name('orders');
     Route::get('/orders/create', [OrderController::class, 'create'])
-        ->name('admin.orders.create');
+        ->name('orders.create');
 
     Route::get('/sales',[ SalesController::class, 'index'])
-        ->name('admin.sales');
+        ->name('sales');
+
+    Route::get('/inventory', function() {
+        dd('this is inventory');
+    })
+        ->name('inventory');
 });
 
 
 // cashier
-Route::middleware(['auth', 'role:cashier'])->prefix('cashier')->group(function() {
+Route::middleware(['auth', 'role:cashier'])->prefix('cashier')->name('cashier.')->group(function() {
     Route::get('/dashboard', [CashierController::class, 'index'])
-        ->name('cashier.dashboard');
+        ->name('dashboard');
 });

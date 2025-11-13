@@ -49,45 +49,51 @@
 	<div class="h-full px-3 pb-4 overflow-y-auto bg-white dark:bg-gray-800 flex flex-col justify-between">
 		<ul class="space-y-2 font-medium">
 			<li>
-				<x-sidebar-link href="/{{ $user->role }}/dashboard">
+				<x-sidebar-link href="{{ route($user->role . '.dashboard') }}">
 					<x-slot:icon><i class="ph ph-house"></i></x-slot:icon>
 					Dashboard
 				</x-sidebar-link>
 			</li>
 			<li>
-				<x-sidebar-link href="/{{ $user->role }}/products">
+				<x-sidebar-link href="{{ route($user->role . '.products') }}">
 					<x-slot:icon><i class="ph ph-bag"></i></x-slot:icon>
 					Products
 				</x-sidebar-link>
 			</li>
 			<li>
-				<x-sidebar-link href="/{{ $user->role }}/categories">
+				<x-sidebar-link href="{{ route($user->role . '.categories') }}">
 					<x-slot:icon><i class="ph ph-browsers"></i></x-slot:icon>
 					Categories
 				</x-sidebar-link>
 			</li>
 			<li>
-				<x-sidebar-link href="/{{ $user->role }}/users">
+				<x-sidebar-link href="{{ route($user->role . '.users') }}">
 					<x-slot:icon><i class="ph ph-user"></i></x-slot:icon>
 					Users
 				</x-sidebar-link>
 			</li>
 			<li>
-				<x-sidebar-link href="/{{ $user->role }}/orders/create">
+				<x-sidebar-link href="{{ route($user->role . '.orders.create') }}">
 					<x-slot:icon><i class="ph ph-list"></i></x-slot:icon>
 					Create Order
 				</x-sidebar-link>
 			</li>
 			<li>
-				<x-sidebar-link href="/{{ $user->role }}/orders">
+				<x-sidebar-link href="{{ route($user->role . '.orders') }}">
 					<x-slot:icon><i class="ph ph-clipboard-text"></i></x-slot:icon>
 					Orders
 				</x-sidebar-link>
 			</li>
 			<li>
-				<x-sidebar-link href="/{{ $user->role }}/sales">
+				<x-sidebar-link href="{{ route($user->role . '.sales') }}">
 					<x-slot:icon><i class="ph ph-cash-register"></i></x-slot:icon>
 					Sales
+				</x-sidebar-link>
+			</li>
+			<li>
+				<x-sidebar-link href="{{ route($user->role . '.inventory') }}">
+					<x-slot:icon><i class="ph ph-cash-register"></i></x-slot:icon>
+					Inventory
 				</x-sidebar-link>
 			</li>
 		</ul>
