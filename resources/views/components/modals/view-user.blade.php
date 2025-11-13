@@ -1,5 +1,3 @@
-@props(['header', 'id'])
-
 <!-- Main modal -->
 <div
     x-data="{ open: false, id: '', name: '', role: '', email: '', profile_image: '', email_verified_at: '', created_at: '', updated_at: ''}"

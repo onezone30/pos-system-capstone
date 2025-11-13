@@ -1,8 +1,6 @@
 <x-main>
 
-    <h1 class="text-2xl font-bold">
-        Users
-    </h1>
+    <x-page-title text="User" />
 
     <div class="flex justify-between items-center">
 

@@ -2,7 +2,7 @@
     <div class="flex items-end gap-3">
         <div>
             <label class="block text-sm font-medium text-gray-300">Category</label>
-            <x-forms.select wire:model="category">
+            <x-forms.select wire:model.live="category">
                 <option value="">
                     All
                 </option>
@@ -15,7 +15,7 @@
         </div>
         <div>
             <label class="block text-sm font-medium text-gray-300">Order By</label>
-            <x-forms.select wire:model="field">
+            <x-forms.select wire:model.live="field">
                 <option value="name">Name</option>
                 <option value="price">Price</option>
                 <option value="created_at">Newest</option>
@@ -23,13 +23,13 @@
         </div>
         <div>
             <label class="block text-sm font-medium text-gray-300">Direction</label>
-            <x-forms.select wire:model="order">
+            <x-forms.select wire:model.live="order">
                 <option value="asc">Ascending</option>
                 <option value="desc">Descending</option>
             </x-forms.select>
         </div>
         <div>
-            <x-button type="submit" class="py-5 px-3">
+            <x-button type="submit" class="py-5 px-5">
                 Sort
             </x-button>
         </div>

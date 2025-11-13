@@ -25,19 +25,36 @@
                 @endforeach
             </x-forms.select>
 
-            @foreach ($sizes as $index => $size)
-                <h1 class="text-xl">
-                    {{ ucfirst($size) }} Size
-                </h1>
-                <div class="grid grid-cols-2 gap-4">
-                    <x-forms.input 
-                        wire:model="prices.{{ $index }}"
-                        placeholder="Enter price"/>
-                    <x-forms.input 
-                        wire:model="quantities.{{ $index }}"
-                        placeholder="Enter quantity stock"/>
-                </div>
-            @endforeach
+            <div class="space-y-4">
+                @foreach ($sizes as $index => $size)
+                    <div class="border p-4 rounded-lg space-y-3">
+                        <div class="flex justify-between items-center">
+                            <h2 class="text-lg font-semibold">Size {{ $index + 1 }}</h2>
+                            <x-button size="sm" color="red" wire:click="removeSize({{ $index }})">
+                                Remove
+                            </x-button>
+                        </div>
+
+                        <x-forms.input 
+                            wire:model="sizes.{{ $index }}"
+                            label="Size Name"
+                            placeholder="Enter size name"/>
+
+                        <div class="grid grid-cols-2 gap-4">
+                            <x-forms.input 
+                                wire:model="prices.{{ $index }}"
+                                placeholder="Enter price"/>
+                            <x-forms.input 
+                                wire:model="quantities.{{ $index }}"
+                                placeholder="Enter quantity"/>
+                        </div>
+                    </div>
+                @endforeach
+
+                <x-button color="green" wire:click="addSize">
+                    + Add Size
+                </x-button>
+            </div>
             
             <x-forms.file 
                 accept="image/*"

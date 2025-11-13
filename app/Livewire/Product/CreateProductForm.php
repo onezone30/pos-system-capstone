@@ -18,20 +18,20 @@ class CreateProductForm extends Component
      #[Validate('nullable|image|max:2048')]
     public $product_image;
 
-    public array $sizes = ['small', 'medium', 'large'];
-    public array $prices = ['', '', ''];
-    public array $quantities = ['', '', ''];
+    public array $sizes = [
+        ['name' => '', 'price' => '', 'quantity' => '']
+    ];
 
     public function rules() 
     {
         $rules = [
-            'name'          => 'required|string|max:255',
-            'category_id'   => 'required|exists:categories,id',
-            'prices'        => 'array',
-            'quantities'    => 'array',
-            'prices.*'      => 'required_with:quantities.*|min:0|max:999999.99',
-            'quantities.*'  => 'required_with:prices.*|integer|min:0',
-            'product_image' => 'nullable|image|max:2048|mimes:jpg,jpeg,png,webp',
+            'name'                  => 'required|string|max:255',
+            'category_id'           => 'required|exists:categories,id',
+            'sizes'                 => 'required|array|min:1',
+            'sizes.*.name'          => 'required|string|max:100',
+            'sizes.*.price'         => 'required|numeric|min:0|max:999999.99',
+            'sizes.*.quantity'      => 'required|integer|min:0',
+            'product_image'         => 'nullable|image|max:2048|mimes:jpg,jpeg,png,webp',
         ];
 
         return $rules;
@@ -40,22 +40,22 @@ class CreateProductForm extends Component
     public function messages()
     {
         return [
-            'name.required'             => 'Product name is required.',
-            'category_id.required'      => 'Please select a category.',
-            'category_id.exists'        => 'The selected category is invalid.',
-            'prices.*.required_with'    => 'Price is required when quantity is provided.',
-            'prices.*.numeric'          => 'Price must be a valid number.',
-            'prices.*.min'              => 'Price cannot be negative.',
-            'prices.*.max'              => 'Price cannot exceed 999,999.99.',
-            'quantities.*.required_with'=> 'Quantity is required when price is provided.',
-            'quantities.*.integer'      => 'Quantity must be an integer.',
-            'quantities.*.min'          => 'Quantity cannot be negative.',
-            'product_image.image'       => 'Uploaded file must be an image.',
-            'product_image.max'         => 'Image size must not exceed 2MB.',
-            'product_image.mimes'       => 'Only JPG, JPEG, PNG, and WEBP formats are allowed.',
+            'sizes.*.name.required' => 'Each size needs a name.',
+            'sizes.*.price.required' => 'Each size needs a price.',
+            'sizes.*.quantity.required' => 'Each size needs a quantity.',
         ];
     }
 
+    public function addSize()
+    {
+        $this->sizes[] = ['name' => '', 'price' => '', 'quantity' => ''];
+    }
+
+    public function removeSize($index)
+    {
+        unset($this->sizes[$index]);
+        $this->sizes = array_values($this->sizes);
+    }
 
     public function create(ProductServices $service)
     {
@@ -65,9 +65,7 @@ class CreateProductForm extends Component
             'name'          => $validate['name'],
             'category_id'   => $validate['category_id'],
             'product_image' => $validate['product_image'],
-            'sizes'         => $this->sizes,
-            'prices'        => $validate['prices'],
-            'quantities'    => $validate['quantities']
+            'sizes'         => $validate['sizes']
         ];
 
         
@@ -87,8 +85,7 @@ class CreateProductForm extends Component
     {
         $this->name = '';
         $this->category_id = 0;
-        $this->prices = [];
-        $this->quantities = [];
+        $this->sizes = [['name' => '', 'price' => '', 'quantity' => '']];
         $this->product_image = null;
     }
 

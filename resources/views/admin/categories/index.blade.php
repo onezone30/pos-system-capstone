@@ -1,8 +1,6 @@
 <x-main>
 
-        <h1 class="text-2xl font-bold">
-            Categories
-        </h1>
+        <x-page-title text="Categories" />
 
         <div class="flex justify-between items-center">
 

@@ -7,7 +7,10 @@ use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\auth\ForgotPasswordController;
 use App\Http\Controllers\auth\LoginController;
 use App\Http\Controllers\auth\PasswordController;
+use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\SalesController;
 use App\Http\Controllers\SearchController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
@@ -52,7 +55,9 @@ Route::get('/logout', [LoginController::class, 'destroy'])
         ->name('logout')
         ->middleware('auth');
 
-
+Route::middleware('auth')->group(function() {
+    Route::get('/profile/{userId}', [ProfileController::class, 'create']);
+});
 
 // customer
 Route::middleware(['auth', 'role:customer'])->prefix('customer')->group(function() {
@@ -73,7 +78,7 @@ Route::middleware(['auth', 'role:customer'])->prefix('customer')->group(function
 
 // admin
 Route::middleware(['auth', 'role:admin'])->prefix('admin')->group(function() {
-    Route::get('/dashboard', [AdminController::class, 'index'])
+    Route::get('/dashboard', [AdminController::class, 'dashboard'])
         ->name('admin.dashboard');
 
     // products
@@ -107,6 +112,15 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->group(function() {
         ->name('admin.categories.update');
     Route::delete('/categories/{category}', [CategoryController::class, 'destroy'])
         ->name('admin.categories.destroy');
+
+    // orders
+    Route::get('/orders', [OrderController::class, 'index'])
+        ->name('admin.orders');
+    Route::get('/orders/create', [OrderController::class, 'create'])
+        ->name('admin.orders.create');
+
+    Route::get('/sales',[ SalesController::class, 'index'])
+        ->name('admin.sales');
 });
 
 

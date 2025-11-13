@@ -1,8 +1,6 @@
 <x-main>
 
-        <h1 class="text-2xl font-bold">
-            Create Order
-        </h1>
+        <x-page-title text="Create Order" />
 
         <div class="flex justify-between items-center">
 

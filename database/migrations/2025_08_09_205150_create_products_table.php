@@ -19,6 +19,7 @@ return new class extends Migration
                 ->constrained()
                 ->cascadeOnDelete();
             $table->string('name');
+            $table->integer('reorder_level')->default(10);
             $table->string('product_image')->nullable();
             $table->timestamps();
         });

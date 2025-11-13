@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Auth;
 
 class AdminController extends Controller
 {
-    public function index()
+    public function dashboard()
     {
         $user = Auth::user();
 

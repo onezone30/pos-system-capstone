@@ -25,19 +25,46 @@
                 @endforeach
             </x-forms.select>
 
-            @foreach ($sizes as $index => $size)
-                <h1 class="text-xl">
-                    {{ ucfirst($size) }} Size
-                </h1>
-                <div class="grid grid-cols-2 gap-4">
-                    <x-forms.input 
-                        wire:model="prices.{{ $index }}"
-                        placeholder="Enter price"/>
-                    <x-forms.input 
-                        wire:model="quantities.{{ $index }}"
-                        placeholder="Enter quantity stock"/>
+            <!-- Dynamic Sizes -->
+            <div class="space-y-4">
+                <div class="flex justify-between items-center">
+                    <h2 class="text-lg font-semibold text-gray-800 dark:text-gray-200">Sizes</h2>
+                    <x-button color="green" size="sm" wire:click.prevent="addSize">+ Add Size</x-button>
                 </div>
-            @endforeach
+
+                @foreach ($sizes as $index => $size)
+                    <div class="p-4 border rounded-lg bg-gray-50 dark:bg-gray-800 space-y-3 relative">
+                        <div class="absolute top-2 right-2">
+                            <x-button 
+                                color="red" 
+                                size="xs"
+                                wire:click.prevent="removeSize({{ $index }})"
+                            >
+                                Remove
+                            </x-button>
+                        </div>
+
+                        <x-forms.input 
+                            wire:model="sizes.{{ $index }}.name"
+                            label="Size Name"
+                            placeholder="e.g. Small"
+                        />
+
+                        <div class="grid grid-cols-2 gap-4">
+                            <x-forms.input 
+                                wire:model="sizes.{{ $index }}.price"
+                                label="Price"
+                                placeholder="Enter price"
+                            />
+                            <x-forms.input 
+                                wire:model="sizes.{{ $index }}.quantity"
+                                label="Quantity"
+                                placeholder="Enter quantity stock"
+                            />
+                        </div>
+                    </div>
+                @endforeach
+            </div>
             
             <x-forms.file 
                 accept="image/*"

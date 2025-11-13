@@ -7,7 +7,9 @@ use App\Models\Product;
 use App\Models\Cart;
 use App\Models\CartItem;
 use App\Models\Order;
+use App\Models\SalesHistory;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Livewire\Component;
 
 class CartComponent extends Component
@@ -15,6 +17,7 @@ class CartComponent extends Component
     public $items = [];
     public $cart;
     public int $itemCount = 0;
+    public string $customer_name = 'Guest';
     public ?int $amount_paid = 0;
     public string $paymentMethod = '';
     public int $quantity = 0;
@@ -89,23 +92,20 @@ class CartComponent extends Component
             return;
         }
 
-        if($this->items === []) {
+        if(empty($this->items)) {
             $this->dispatch('toast.error', message: 'No items in the cart');
             return;
         }
 
-        if($this->cart) {
-            $invalidItem = $this->cart->items->filter(fn($item) => $item->price === null || $item->price->price === null);
-
-            if($invalidItem->isNotEmpty()) {
-                $this->dispatch('toast.error', message: 'Product has null value. Product were removed from your cart');
-                $this->loadCart();
-                return;
-            }
+        if(empty($this->paymentMethod)) {
+            $this->dispatch('toast.error', message: 'Choose payment method');
+            return;
         }
 
-        if($this->paymentMethod == '') {
-            $this->dispatch('toast.error', message: 'Choose payment method');
+        $invalidItem = $this->cart->items->filter(fn($item) => !$item->price || $item->price->price === null);
+        if($invalidItem->isNotEmpty()) {
+            $this->dispatch('toast.error', message: 'Product has null value. Product were removed from your cart');
+            $this->loadCart();
             return;
         }
 
@@ -119,34 +119,39 @@ class CartComponent extends Component
             return;
         }
 
-        foreach ($this->cart->items as $item) {
-            if ($item->quantity > $item->price->quantity_stock) {
-                $this->dispatch('toast.error', message: 'Order quantity exceeds available stock for ' . $item->product->name);
-                return;
-            }
-        }
-
+        DB::transaction(function () {
         $order = Order::create([
             'user_id' => Auth::id(),
             'total_amount' => $this->total,
             'amount_paid' => $this->amount_paid,
+            'customer_name' => $this->customer_name ?: 'Guest',
             'change' => $this->change,
             'payment_method' => $this->paymentMethod
         ]);
 
-        foreach($this->cart->items as $item) {
-            $subtotal = $item->quantity * $item->price?->price;
+        foreach ($this->cart->items as $item) {
+            $price = $item->price?->price ?? 0;
+            $subtotal = $item->quantity * $price;
 
             OrderItems::create([
                 'order_id' => $order->id,
                 'product_id' => $item->product_id,
                 'quantity' => $item->quantity,
-                'price' => $item->price?->price ?? 0,
+                'price' => $price,
                 'subtotal' => $subtotal
             ]);
 
             $item->price->decrement('quantity_stock', $item->quantity);
+
+            $history = SalesHistory::firstOrNew([
+                'product_id' => $item->product_id,
+                'date' => now()->toDateString()
+            ]);
+            $history->quantity_sold = ($history->quantity_sold ?? 0) + $item->quantity;
+            $history->total_sales = ($history->total_sales ?? 0) + $subtotal;
+            $history->save();
         }
+    });
 
         $this->dispatch('close-create-modal');
         $this->resetCart();

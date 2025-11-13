@@ -40,15 +40,12 @@ class ProductServices {
 
         $product = Product::create($productData);
 
-        foreach ($data['sizes'] as $index => $size) {
-            $price = trim((string)($data['prices'][$index] ?? ''));
-            $quantity = trim((string)($data['quantities'][$index] ?? ''));
-
+        foreach ($data['sizes'] as $size) {
             $pricesData = [
                 'product_id' => $product->id,
-                'price' => $price === '' ? null : (float) $price,
-                'quantity_stock' => $quantity === '' ? null : (float) $quantity,
-                'size' => $size,
+                'price' => $size['price'] === '' ? null : (float) $size['price'],
+                'quantity_stock' => $size['quantity'] === '' ? null : (float) $size['quantity'],
+                'size' => $size['name'],
             ];
 
             ProductPrices::create($pricesData);

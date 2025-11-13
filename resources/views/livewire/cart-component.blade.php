@@ -128,6 +128,17 @@
                     <div class="space-y-4">
                         <dl class="w-full flex items-center justify-between gap-4">
                             <dt class="text-base font-normal text-gray-500 dark:text-gray-400">
+                                Customer Name
+                            </dt>
+                            <dd class="flex-1 max-w-[100px]">
+                                <input 
+                                    wire:model="customer_name"
+                                    class="w-full text-right text-base bg-black/50 py-2 px-4 rounded-lg font-medium text-gray-900 dark:text-white border-none focus:ring-0 focus:outline-none"
+                                />
+                            </dd>
+                        </dl>
+                        <dl class="w-full flex items-center justify-between gap-4">
+                            <dt class="text-base font-normal text-gray-500 dark:text-gray-400">
                                 Amount Paid
                             </dt>
                             <dd class="flex-1 max-w-[100px]">

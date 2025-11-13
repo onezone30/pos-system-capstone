@@ -14,6 +14,7 @@ class ProductList extends Component
 
     public string $search = "";
 
+    #[On('searchUpdated')]
     public function productSearch($search)
     {
         $this->search = trim($search);
