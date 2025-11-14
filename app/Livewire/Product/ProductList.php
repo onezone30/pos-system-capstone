@@ -12,32 +12,11 @@ class ProductList extends Component
 {
     use WithPagination;
 
-    public string $search = "";
-
-    #[On('searchUpdated')]
-    public function productSearch($search)
-    {
-        $this->search = trim($search);
-        $this->resetPage();
-    }
 
     #[On('editProduct', 'createProduct')]
     public function updatingSearch()
     {
         $this->resetPage();
-    }
-
-    public function filteredProduct()
-    {
-          return Product::query()
-            ->when($this->search, function($query) {
-                $query->where('name', 'like', "%{$this->search}%")
-                    ->orWhereHas('category', function($q) {
-                        $q->where('name', 'like', "%{$this->search}%");
-                    });
-            })
-            ->with('category')
-            ->paginate(10);
     }
 
     public function delete(int $id)
@@ -55,11 +34,12 @@ class ProductList extends Component
 
     public function render()
     {            
+        $products = Product::with('category')->get();
         $categories = Category::query()
             ->get();
 
         return view('livewire.product.product-list', [
-            'products' => $this->filteredProduct(),
+            'products' => $products,
             'categories' => $categories
         ]);
     }
