@@ -4,51 +4,18 @@ namespace App\Livewire\User;
 
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
+use Livewire\Attributes\On;
 use Livewire\Component;
 
 use function PHPSTORM_META\map;
 
 class UserList extends Component
 {
-    public string $search = "";
-    public $users = [];
-
-    protected $listeners = [
-        'searchUpdated' => 'userSearch',
-        'editUser' => 'load',
-        'createUser' => 'load'
-    ];
-
-    public function mount()
+    #[On(['editUser', 'createUser'])]
+    public function refreshPage()
     {
-        $this->load();
+        $this->reset();
     }
-
-    public function load()
-    {
-        $this->users = $this->filteredUser();
-    }
-
-    public function userSearch($search)
-    {
-        $this->search = trim($search);
-        $this->load();
-    }
-
-    public function filteredUser()
-    {
-        $users = User::query()
-            ->when($this->search, function($query) {
-                $query->where('name', 'like', "%{$this->search}%")
-                    ->orWhere('role', 'like', "%{$this->search}%")
-                    ->orWhere('email', 'like', "%{$this->search}%");
-            })
-            ->latest()
-            ->get();
-
-        return $users;
-    }
-
     public function delete(int $id)
     {
         $user = User::findOrFail($id);
@@ -57,15 +24,17 @@ class UserList extends Component
             $this->dispatch('toast.success', message: "Failed to delete {$user->name}");
         }
         
-        $this->load();
+        $this->refreshPage();
         $this->dispatch('toast.success', message: "{$user->name} has been deleted");
         $this->dispatch('close-delete-modal');
     }
 
     public function render()
     {
+        $users = User::get();
+
         return view('livewire.user.user-list', [
-            'users' => $this->users,
+            'users' => $users,
         ]);
     }
 }
