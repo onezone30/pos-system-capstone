@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Models\Category;
 use App\Models\Order;
 use App\Models\Product;
 use Illuminate\Http\Request;
@@ -28,9 +29,11 @@ class OrderController extends Controller
     public function create()
     {
         $products = Product::with(['prices', 'category'])->get();
+        $categories = Category::all();
 
         return view($this->user->role . '.orders.create', [
             'products' => $products,
+            'categories' => $categories,
         ]);
     }
 }
