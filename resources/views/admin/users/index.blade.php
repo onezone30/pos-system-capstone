@@ -12,7 +12,7 @@
         </x-button>
         <!-- Create User Form -->
         <x-modals.create header="Create User">
-            @livewire('user.create-user-form')
+            <livewire:user.create-user-form />
         </x-modals.create>
 
     </div>
