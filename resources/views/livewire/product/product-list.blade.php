@@ -100,7 +100,6 @@
                     return 0;
                 });
 
-                // append in order (appendChild moves existing nodes)
                 items.forEach(node => list.appendChild(node));
             },
 

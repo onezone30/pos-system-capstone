@@ -13,10 +13,10 @@ class ProductList extends Component
     use WithPagination;
 
 
-    #[On('editProduct', 'createProduct')]
-    public function updatingSearch()
+    #[On(['editProduct', 'createProduct'])]
+    public function refreshPage()
     {
-        $this->resetPage();
+        $this->reset();
     }
 
     public function delete(int $id)
@@ -27,7 +27,7 @@ class ProductList extends Component
             $this->dispatch('toast.success', message: "Failed to delete {$product->name}");
         }
 
-        $this->updatingSearch();
+        $this->refreshPage();
         $this->dispatch('toast.success', message: "{$product->name} has been deleted");
         $this->dispatch('close-delete-modal');
     }
