@@ -48,10 +48,10 @@ class UserFactory extends Factory
         ]);
     }
     
-    public function customer()
+    public function owner()
     {
         return $this->state(fn(array $attributes) => [
-            'role' => 'customer'
+            'role' => 'owner'
         ]);
     }
 

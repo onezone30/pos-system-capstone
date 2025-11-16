@@ -19,7 +19,7 @@ class User extends Authenticatable
      * @var list<string>
      */
 
-    const ROLES = ['admin', 'cashier', 'customer'];
+    const ROLES = ['admin', 'cashier', 'owner'];
 
     protected $fillable = [
         'name',
@@ -53,7 +53,7 @@ class User extends Authenticatable
     {
         return match(strtolower($this->role)) {
             'admin' => 'bg-violet-100 text-violet-800 dark:bg-violet-900 dark:text-violet-300',
-            'cashier' => 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300',
+            'owner' => 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300',
             'manager' => 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300',
             default => 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300',
         };

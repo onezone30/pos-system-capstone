@@ -28,10 +28,10 @@ class UserSeeder extends Seeder
         ]);
         
         User::create([
-            'name' => 'customer',
-            'email' => 'customer@customer',
-            'role' => 'customer',
-            'password' => 'customer',
+            'name' => 'owner',
+            'email' => 'owner@owner',
+            'role' => 'owner',
+            'password' => 'owner',
         ]);
 
         User::create([
@@ -43,8 +43,8 @@ class UserSeeder extends Seeder
 
 
         User::factory(3)->admin()->create(['password' => 'password']);
-        User::factory(3)->customer()->create(['password' => 'password']);
         User::factory(3)->cashier()->create(['password' => 'password']);
+        User::factory(3)->owner()->create(['password' => 'password']);
 
     }
 }
