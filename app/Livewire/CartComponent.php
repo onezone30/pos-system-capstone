@@ -6,6 +6,7 @@ use App\Models\OrderItems;
 use App\Models\Product;
 use App\Models\Cart;
 use App\Models\CartItem;
+use App\Models\InventoryLogs;
 use App\Models\Order;
 use App\Models\SalesHistory;
 use Illuminate\Support\Facades\Auth;
@@ -120,38 +121,45 @@ class CartComponent extends Component
         }
 
         DB::transaction(function () {
-        $order = Order::create([
-            'user_id' => Auth::id(),
-            'total_amount' => $this->total,
-            'amount_paid' => $this->amount_paid,
-            'customer_name' => $this->customer_name ?: 'Guest',
-            'change' => $this->change,
-            'payment_method' => $this->paymentMethod
-        ]);
-
-        foreach ($this->cart->items as $item) {
-            $price = $item->price?->price ?? 0;
-            $subtotal = $item->quantity * $price;
-
-            OrderItems::create([
-                'order_id' => $order->id,
-                'product_id' => $item->product_id,
-                'quantity' => $item->quantity,
-                'price' => $price,
-                'subtotal' => $subtotal
+            $order = Order::create([
+                'user_id' => Auth::id(),
+                'total_amount' => $this->total,
+                'amount_paid' => $this->amount_paid,
+                'customer_name' => $this->customer_name ?: 'Guest',
+                'change' => $this->change,
+                'payment_method' => $this->paymentMethod
             ]);
 
-            $item->price->decrement('quantity_stock', $item->quantity);
+            foreach ($this->cart->items as $item) {
+                $price = $item->price?->price ?? 0;
+                $subtotal = $item->quantity * $price;
 
-            $history = SalesHistory::firstOrNew([
-                'product_id' => $item->product_id,
-                'date' => now()->toDateString()
-            ]);
-            $history->quantity_sold = ($history->quantity_sold ?? 0) + $item->quantity;
-            $history->total_sales = ($history->total_sales ?? 0) + $subtotal;
-            $history->save();
-        }
-    });
+                OrderItems::create([
+                    'order_id' => $order->id,
+                    'product_id' => $item->product_id,
+                    'quantity' => $item->quantity,
+                    'price' => $price,
+                    'subtotal' => $subtotal
+                ]);
+
+                $item->price->decrement('quantity_stock', $item->quantity);
+
+                InventoryLogs::create([
+                    'product_id' => $item->product_id,
+                    'type' => 'out',
+                    'quantity' => $item->quantity,
+                    'note' => "Order #{$order->id} by " . auth()->user()->name . " - {$item->product->name} (size: {$item->price->size})",
+                ]);
+
+                $history = SalesHistory::firstOrNew([
+                    'product_id' => $item->product_id,
+                    'date' => now()->toDateString()
+                ]);
+                $history->quantity_sold = ($history->quantity_sold ?? 0) + $item->quantity;
+                $history->total_sales = ($history->total_sales ?? 0) + $subtotal;
+                $history->save();
+            }
+        });
 
         $this->dispatch('close-create-modal');
         $this->resetCart();

@@ -5,6 +5,7 @@ namespace App\Services;
 
 use App\Http\Requests\PriceRequest;
 use App\Http\Requests\ProductRequest;
+use App\Models\InventoryLogs;
 use App\Models\Product;
 use App\Models\ProductPrices;
 use Illuminate\Http\Request;
@@ -41,6 +42,8 @@ class ProductServices {
         $product = Product::create($productData);
 
         foreach ($data['sizes'] as $size) {
+            $quantity = $size['quantity'] === '' ? null : (float) $size['quantity'];
+
             $pricesData = [
                 'product_id' => $product->id,
                 'price' => $size['price'] === '' ? null : (float) $size['price'],
@@ -49,44 +52,77 @@ class ProductServices {
             ];
 
             ProductPrices::create($pricesData);
+
+            if ($quantity && $quantity > 0) {
+                InventoryLogs::create([
+                    'product_id' => $product->id,
+                    'type' => 'in',
+                    'quantity' => $quantity,
+                    'note' => "Initial stock for size {$size['name']}",
+                ]);
+            }
         }
 
         return $product;
     }
 
-    public function update(Product $product, array $data) {
+    public function update(Product $product, array $data)
+    {
+        $product_image = null;
+        if (isset($data['product_image']) && $data['product_image'] instanceof TemporaryUploadedFile) {
+            $product_image = $this->handleImage($data['product_image'], $product->product_image);
+        }
 
-        if(
-            isset($data['product_image']) &&
-            $data['product_image'] instanceof TemporaryUploadedFile
-            ) {
-                $product_image = $this->handleImage($data['product_image'], $product->product_image);
-            }
-        else  {
-                $product_image = null;
-            }
-
-
-        $productData = [
+        $product->update([
             'name' => $data['name'],
             'category_id' => $data['category_id'],
-            'product_image' => $product_image,
-        ];
-        
-        $product->update($productData);
+            'product_image' => $product_image ?? $product->product_image,
+        ]);
 
-        foreach($data['prices'] as $priceData) {
-            $product->prices()->updateOrCreate(
+        $submittedSizes = collect($data['prices'])->pluck('size')->toArray();
+        $deletedPrices = $product->prices()->whereNotIn('size', $submittedSizes)->get();
+
+        foreach ($deletedPrices as $price) {
+            InventoryLogs::create([
+                'product_id' => $product->id,
+                'type' => 'out',
+                'quantity' => $price->quantity_stock,
+                'note' => "Size {$price->size} removed",
+            ]);
+        }
+
+        $product->prices()->whereNotIn('size', $submittedSizes)->delete();
+
+        foreach ($data['prices'] as $priceData) {
+
+            $price = $product->prices()->where('size', $priceData['size'])->first();
+            $oldQty = $price?->quantity_stock ?? 0;
+            $newQty = $priceData['quantity_stock'] ?? 0;
+
+            // Update or create
+            $price = $product->prices()->updateOrCreate(
                 ['size' => $priceData['size']],
                 [
-                    'price'          => $priceData['price'] ?? null,
-                    'quantity_stock' => $priceData['quantity_stock'] ?? null,
+                    'price' => $priceData['price'] ?? null,
+                    'quantity_stock' => $newQty,
                 ]
             );
+
+            if ($newQty != $oldQty) {
+                InventoryLogs::create([
+                    'product_id' => $product->id,
+                    'type' => $newQty > $oldQty ? 'in' : 'out',
+                    'quantity' => abs($newQty - $oldQty),
+                    'note' => $oldQty == 0
+                        ? "Initial stock for size {$price->size}"
+                        : "Stock updated for size {$price->size}",
+                ]);
+            }
         }
 
         return $product;
     }
+
 
     private function syncPrices(object $product, array $priceRequest) {
 
