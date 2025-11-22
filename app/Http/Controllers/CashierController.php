@@ -33,6 +33,7 @@ class CashierController extends Controller
 
                 // ===== PAYMENT METHODS =====
         $paymentMethods = Order::selectRaw('payment_method, COUNT(*) as total')
+            ->whereDate('created_at', today())
             ->groupBy('payment_method')
             ->get();
 
