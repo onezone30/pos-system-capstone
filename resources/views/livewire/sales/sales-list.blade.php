@@ -90,7 +90,7 @@
                                 </span>
                             </td>
                             <td class="px-6 py-4">
-                                {{ $sale->created_at->diffForHumans() }}
+                                {{ $sale->created_at }}
                             </td>
                             <td class="px-6 py-4">
                                 {{ $sale->updated_at->diffForHumans() }}

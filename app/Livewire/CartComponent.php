@@ -137,6 +137,7 @@ class CartComponent extends Component
                 OrderItems::create([
                     'order_id' => $order->id,
                     'product_id' => $item->product_id,
+                    'price_id' => $item->price_id,
                     'quantity' => $item->quantity,
                     'price' => $price,
                     'subtotal' => $subtotal
@@ -152,6 +153,7 @@ class CartComponent extends Component
                 ]);
 
                 $history = SalesHistory::firstOrNew([
+                    'order_id' => $order->id,
                     'product_id' => $item->product_id,
                     'date' => now()->toDateString()
                 ]);

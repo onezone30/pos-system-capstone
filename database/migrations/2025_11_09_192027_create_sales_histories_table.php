@@ -1,5 +1,7 @@
 <?php
 
+use App\Models\Order;
+use App\Models\OrderItems;
 use App\Models\Product;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
@@ -14,6 +16,7 @@ return new class extends Migration
     {
         Schema::create('sales_histories', function (Blueprint $table) {
             $table->id();
+            $table->foreignIdFor(Order::class, 'order_id')->nullable()->constrained()->cascadeOnDelete();
             $table->foreignIdFor(Product::class);
             $table->date('date');
             $table->integer('quantity_sold')->default(0);

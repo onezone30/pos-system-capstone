@@ -1,11 +1,8 @@
-@props(['icon', 'alt' => false])
+@props(['icon'])
 
-<a {{ $attributes }} class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
-
-    {{ $icon }}
-
-    <!-- Sidebar Nav Link -->
-    <span class="ms-3">
-        {{ $slot }}
-    </span>
+<a {{ $attributes }} class="flex items-center p-2 text-base font-normal text-gray-900 rounded-lg hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700">
+    @isset($icon)
+        <span class="me-3">{{ $icon }}</span>
+    @endisset
+    {{ $slot }}
 </a>

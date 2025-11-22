@@ -2,26 +2,16 @@
     <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
         <thead class="text-center text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
             <tr>
-                <th scope="col" class="px-6 py-3">
-                    Order ID
-                </th>
-                <th scope="col" class="px-6 py-3">
-                    User Name
-                </th>
-                <th scope="col" class="px-6 py-3">
-                    Role
-                </th>
-                <th scope="col" class="px-6 py-3">
-                    Customer Name
-                </th>
-                <th scope="col" class="px-6 py-3">
-                    Payment Method
-                </th>
-                <th scope="col" class="px-6 py-3">
-                    Items
-                </th>
-                <th scope="col" class="px-6 py-3">
-                    Action
+                <th class="px-6 py-3">Order ID</th>
+                <th class="px-6 py-3">User Name</th>
+                <th class="px-6 py-3">Role</th>
+                <th class="px-6 py-3">Customer Name</th>
+                <th class="px-6 py-3">Payment Method</th>
+                <th class="px-6 py-3">Items</th>
+                <th class="px-6 py-3">
+                    @if (auth()->user()->role !== 'cashier')
+                        Action
+                    @endif
                 </th>
             </tr>
         </thead>
@@ -60,43 +50,41 @@
                             </div>
                         </td>
                         <td class="px-6 py-4">
-                            <div class="flex justify-center gap-1.5">
-                                <x-button
-                                    @click="$dispatch('open-edit-modal', {id: {{ $order->id }}})"
-                                >
-                                    Edit
-                                </x-button>
-                                <x-button 
-                                    @click="$dispatch('open-delete-modal', {id: {{ $order->id }}})"
-                                    color="red">
-                                    Delete
-                                </x-button>
-                            </div>
+                            @if (auth()->user()->role !== 'cashier')
+                                <div class="flex justify-center gap-1.5">
+                                    <x-button
+                                        @click="$dispatch('open-edit-modal', {id: {{ $order->id }}})"
+                                    >
+                                        Edit
+                                    </x-button>
+
+                                    <x-button 
+                                        @click="$dispatch('open-delete-modal', {id: {{ $order->id }}})"
+                                        color="red"
+                                    >
+                                        Delete
+                                    </x-button>
+                                </div>
+                            @endif
                         </td>
                     </tr>
                 @endforeach
             @else
                 <tr class="text-center bg-white border-b dark:bg-gray-800 dark:border-gray-700 border-gray-200 hover:bg-gray-50 dark:hover:bg-gray-600">
-                    <th colspan="8" class="px-6 py-4 font-bold text-2xl text-gray-900 whitespace-nowrap dark:text-white">
+                    <th colspan="7" class="px-6 py-4 font-bold text-2xl text-gray-900 dark:text-white">
                         No Orders
                     </th>
                 </tr>
-            @endif
-            </tbody>
+            @endforelse
+        </tbody>
     </table>
 
     <div class="mt-4">
         {{ $orders->links() }}
     </div>
 
-    <!-- rendering modals -->
-    <!-- Edit Modal -->
-    <x-modals.edit>
-        <livewire:order.edit-order-form />
-    </x-modals.edit>
-    <!-- View Modal -->
+    <!-- Modals -->
+    <x-modals.edit><livewire:order.edit-order-form /></x-modals.edit>
     <x-modals.view-order />
-    <!-- Delete Modal -->
     <x-modals.delete />
-
 </div>

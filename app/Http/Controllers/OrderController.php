@@ -21,9 +21,13 @@ class OrderController extends Controller
     public function index()
     {
         $orders = Order::with('items')->get();
+        $categories = Category::all();
+        $products = Product::all();
 
         return view($this->user->role . '.orders.index', [
             'orders' => $orders,
+            'categories' => $categories,
+            'products' => $products,
         ]);
     }
     public function create()
@@ -34,6 +38,15 @@ class OrderController extends Controller
         return view($this->user->role . '.orders.create', [
             'products' => $products,
             'categories' => $categories,
+        ]);
+    }
+
+    public function print($id)
+    {
+        $order = Order::with('items.product', 'user')->findOrFail($id);
+
+        return view('print', [
+            'order' => $order,
         ]);
     }
 }

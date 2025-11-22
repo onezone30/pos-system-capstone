@@ -3,10 +3,11 @@
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\CashierController;
 use App\Http\Controllers\CategoryController;
-use App\Http\Controllers\CustomerController;
+use App\Http\Controllers\ownerController;
 use App\Http\Controllers\auth\ForgotPasswordController;
 use App\Http\Controllers\auth\LoginController;
 use App\Http\Controllers\auth\PasswordController;
+use App\Http\Controllers\InventoryController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProfileController;
@@ -54,25 +55,29 @@ Route::middleware(['guest'])->group(function() {
 Route::get('/logout', [LoginController::class, 'destroy'])
         ->name('logout')
         ->middleware('auth');
-
+        
 Route::middleware('auth')->group(function() {
-    Route::get('/profile/{userId}', [ProfileController::class, 'create']);
+    Route::get('/profile/{id}', [ProfileController::class, 'show'])
+        ->name('profile');
+    Route::patch('/profile/{id}', [ProfileController::class, 'update'])
+        ->name('profile.update');
 });
 
-// customer
-Route::middleware(['auth', 'role:customer'])->prefix('customer')->group(function() {
-    Route::get('/dashboard', [CustomerController::class, 'index'])
-        ->name('customer.dashboard');
+// owner
+Route::middleware(['auth', 'role:owner'])->prefix('owner')->name('owner.')->group(function() {
+    Route::get('/dashboard', [OwnerController::class, 'dashboard'])
+        ->name('dashboard');
 
-    Route::get('/products', function() {
-        dd('customer product');
-    });
+    Route::get('/orders', [OrderController::class, 'index'])
+        ->name('orders');
+    Route::get('/orders/create', [OrderController::class, 'create'])
+        ->name('orders.create');
 
-    // user
-    Route::post('/users', function() {
-        dd('customer user');
-    })->name('cashier.user');
-        
+    Route::get('/sales',[ SalesController::class, 'index'])
+        ->name('sales');
+
+    Route::get('/inventory', [InventoryController::class, 'index'])
+        ->name('inventory');
 });
 
 
@@ -119,18 +124,23 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::get('/orders/create', [OrderController::class, 'create'])
         ->name('orders.create');
 
+
     Route::get('/sales',[ SalesController::class, 'index'])
         ->name('sales');
 
-    Route::get('/inventory', function() {
-        dd('this is inventory');
-    })
+    Route::get('/inventory', [InventoryController::class, 'index'])
         ->name('inventory');
 });
-
+Route::get('/orders/{id}/print', [OrderController::class, 'print'])
+        ->name('orders.print');
 
 // cashier
 Route::middleware(['auth', 'role:cashier'])->prefix('cashier')->name('cashier.')->group(function() {
-    Route::get('/dashboard', [CashierController::class, 'index'])
-        ->name('dashboard');
+    Route::get('/dashboard', [CashierController::class, 'index'])->name('dashboard');
+
+    // Orders
+    Route::get('/orders', [OrderController::class, 'index'])->name('orders');
+    Route::get('/orders/create', [OrderController::class, 'create'])->name('orders.create');
 });
+
+
