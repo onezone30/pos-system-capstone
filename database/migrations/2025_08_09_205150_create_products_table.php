@@ -19,7 +19,6 @@ return new class extends Migration
                 ->constrained()
                 ->cascadeOnDelete();
             $table->string('name');
-            $table->integer('reorder_level')->default(10);
             $table->string('product_image')->nullable();
             $table->timestamps();
         });
@@ -30,6 +29,7 @@ return new class extends Migration
                 ->constrained()
                 ->cascadeOnDelete();
             $table->string('size')->nullable();
+            $table->integer('reorder_level')->default(10);
             $table->decimal('price', 10, 2)->nullable(); 
             $table->integer('quantity_stock')->nullable();
             $table->timestamps();

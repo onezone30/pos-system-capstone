@@ -7,6 +7,7 @@
                 <th class="px-6 py-3">Role</th>
                 <th class="px-6 py-3">Customer Name</th>
                 <th class="px-6 py-3">Payment Method</th>
+                <td class="px-6 py-3">Date & Time</td>
                 <th class="px-6 py-3">Items</th>
                 <th class="px-6 py-3">
                     @if (auth()->user()->role !== 'cashier')
@@ -36,6 +37,9 @@
                             <span class="inline-flex items-center justify-center px-3 py-1.5 text-xs font-semibold rounded-full shadow-sm border border-transparent transition-colors duration-200 uppercase {{ $order->payment_color }}">
                                 {{ $order->payment_method ?? 'Unknown' }}
                             </span>
+                        </td>
+                        <td class="px-6 py-4">
+                            {{ $order->created_at->format('M d, Y, h:i A') }}
                         </td>
                         <td class="px-6 py-4">
                             <div class="flex flex-col items-start gap-1">

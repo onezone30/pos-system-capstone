@@ -14,7 +14,6 @@ class Product extends Model
     protected $fillable = [
         'name',
         'category_id',
-        'reorder_level',
         'product_image'
     ];
 

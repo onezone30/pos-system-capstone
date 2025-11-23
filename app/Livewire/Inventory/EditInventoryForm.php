@@ -20,13 +20,12 @@ class EditInventoryForm extends Component
 
 
     #[On('open-edit-modal')]
-    public function loadItem($product_id, $price_id)
+    public function loadItem($price_id)
     {
 
-        $this->product = Product::with('prices')->findOrFail($product_id);
-        $this->price = $this->product->prices->where('id', $price_id)->first();
+        $this->price = ProductPrices::findOrFail($price_id);
 
-        $this->reorder_level = $this->product->reorder_level;
+        $this->reorder_level = $this->price->first()->reorder_level;
         $this->quantity_stock = $this->price->first()->quantity_stock;
         
     }
@@ -43,12 +42,9 @@ class EditInventoryForm extends Component
     {
         $this->validate();
 
-        $this->product->update([
-            'reorder_level' => $this->reorder_level,
-        ]);
-
         $this->price->update([
             'quantity_stock' => $this->quantity_stock,
+            'reorder_level' => $this->reorder_level,
         ]);
 
         $this->dispatch('editInventory'); 

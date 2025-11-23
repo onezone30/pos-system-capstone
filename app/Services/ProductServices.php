@@ -47,6 +47,7 @@ class ProductServices {
             $pricesData = [
                 'product_id' => $product->id,
                 'price' => $size['price'] === '' ? null : (float) $size['price'],
+                'reorder_level' => $size['reorder_level'] === '' ? null : (float) $size['reorder_level'],
                 'quantity_stock' => $size['quantity'] === '' ? null : (float) $size['quantity'],
                 'size' => $size['name'],
             ];
@@ -105,6 +106,7 @@ class ProductServices {
                 [
                     'price' => $priceData['price'] ?? null,
                     'quantity_stock' => $newQty,
+                    'reorder_level' => $priceData['reorder_level'] ?? null,
                 ]
             );
 

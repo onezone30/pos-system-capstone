@@ -76,12 +76,12 @@
                                 {{ $price->quantity_stock }}
                             </span>
                         </td>
-                        <td class="px-6 py-4">{{ $product->reorder_level }}</td>
+                        <td class="px-6 py-4">{{ $product->prices->pluck('reorder_level')->first() }}</td>
                         <td class="px-6 py-4">₱{{ number_format($price->price, 2) }}</td>
                         <td class="px-6 py-4">{{ $price->updated_at->diffForHumans() }}</td>
                         <td class="px-6 py-4">
                             <div class="flex justify-center gap-2">
-                                <x-button @click="$dispatch('open-edit-modal', {product_id: {{ $product->id }}, price_id: {{ $price->id }}})">
+                                <x-button @click="$dispatch('open-edit-modal', {price_id: {{ $price->id }}})">
                                     Edit
                                 </x-button>
                             </div>

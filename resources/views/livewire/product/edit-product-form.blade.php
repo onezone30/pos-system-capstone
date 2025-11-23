@@ -40,13 +40,18 @@
                             label="Size Name"
                             placeholder="Enter size name"/>
 
-                        <div class="grid grid-cols-2 gap-4">
+                        <div class="grid grid-cols-3 gap-4">
                             <x-forms.input 
                                 wire:model="prices.{{ $index }}"
                                 placeholder="Enter price"/>
+
                             <x-forms.input 
                                 wire:model="quantities.{{ $index }}"
                                 placeholder="Enter quantity"/>
+
+                            <x-forms.input 
+                                wire:model="reorder_levels.{{ $index }}"
+                                placeholder="Reorder level"/>
                         </div>
                     </div>
                 @endforeach

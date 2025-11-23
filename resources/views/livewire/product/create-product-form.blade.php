@@ -50,7 +50,7 @@
                             placeholder="e.g. Small"
                         />
 
-                        <div class="grid grid-cols-2 gap-4">
+                        <div class="grid grid-cols-3 gap-4">
                             <x-forms.input 
                                 wire:model="sizes.{{ $index }}.price"
                                 label="Price"
@@ -59,6 +59,11 @@
                             <x-forms.input 
                                 wire:model="sizes.{{ $index }}.quantity"
                                 label="Quantity"
+                                placeholder="Enter quantity stock"
+                            />
+                            <x-forms.input 
+                                wire:model="sizes.{{ $index }}.reorder_level"
+                                label="Reorder Level"
                                 placeholder="Enter quantity stock"
                             />
                         </div>

@@ -99,23 +99,32 @@
                     <div class="space-y-2">
                         @foreach ($product->prices as $price)
                             @if ($price->quantity_stock !== 0)
-                                <div class="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors duration-200">
-                                    <span class="font-medium text-gray-700 dark:text-gray-300 capitalize">
-                                        {{ $price->size }}
-                                    </span>
-                                    @if($price->quantity_stock < 20)
-                                    <span class="font-bold text-lg text-red-600 dark:text-red-400">
-                                        {{ number_format($price->quantity_stock) }}
-                                    </span>
-                                    @elseif ($price->quantity_stock < 40)
-                                    <span class="font-bold text-lg text-yellow-600 dark:text-yellow-400">
-                                        {{ number_format($price->quantity_stock) }}
-                                    </span>
-                                    @else
-                                    <span class="font-bold text-lg text-green-600 dark:text-green-400">
-                                        {{ number_format($price->quantity_stock) }}
-                                    </span>
-                                    @endif
+                                <div class="p-3 bg-gray-50 dark:bg-gray-700 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors duration-200">
+
+                                    <!-- Size Name -->
+                                    <div class="flex items-center justify-between mb-1">
+                                        <span class="font-medium text-gray-700 dark:text-gray-300 capitalize">
+                                            {{ $price->size }}
+                                        </span>
+
+                                        @php
+                                            $q = $price->quantity_stock;
+                                        @endphp
+
+                                        <span class="font-bold text-lg
+                                            {{ $q < $price->reorder_level ? 'text-red-600 dark:text-red-400' : '' }}
+                                            {{ $q >= $price->reorder_level && $q < $price->reorder_level * 3 ? 'text-yellow-600 dark:text-yellow-400' : '' }}
+                                            {{ $q >= $price->reorder_level * 3 ? 'text-green-600 dark:text-green-400' : '' }}
+                                        ">
+                                            {{ number_format($q) }}
+                                        </span>
+                                    </div>
+
+                                    <!-- Reorder Level -->
+                                    <div class="text-xs text-gray-500 dark:text-gray-400 italic">
+                                        Reorder Level: {{ number_format($price->reorder_level) }}
+                                    </div>
+
                                 </div>
                             @endif
                         @endforeach

@@ -24,6 +24,7 @@ class EditProductForm extends Component
     public array $sizes = ['small', 'medium', 'large'];
     public array $prices = [];
     public array $quantities = [];
+    public array $reorder_levels = [];
 
     public function rules()
     {
@@ -34,8 +35,10 @@ class EditProductForm extends Component
             'sizes.*'       => 'required|string|max:255',
             'prices'        => 'array',
             'quantities'    => 'array',
+            'reorder_levels'    => 'array',
             'prices.*'      => 'nullable|numeric|min:0|max:999999.99',
             'quantities.*'  => 'nullable|integer|min:0',
+            'reorder_levels.*'  => 'nullable|integer|min:0',
         ];
 
         if ($this->product_image instanceof \Livewire\Features\SupportFileUploads\TemporaryUploadedFile) {
@@ -48,6 +51,7 @@ class EditProductForm extends Component
     #[On('open-edit-modal')]
     public function load($id)
     {
+        
         $this->product = Product::with('prices')->findOrFail($id);
         $this->name = $this->product->name;
         $this->category_id = $this->product->category_id;
@@ -57,11 +61,13 @@ class EditProductForm extends Component
         $this->sizes = [];
         $this->prices = [];
         $this->quantities = [];
+        $this->reorder_levels = [];
 
         foreach ($this->product->prices as $price) {
             $this->sizes[] = $price->size;
             $this->prices[] = $price->price;
             $this->quantities[] = $price->quantity_stock;
+            $this->reorder_levels[] = $price->reorder_level;
         }
     }
     public function addSize()
@@ -69,6 +75,7 @@ class EditProductForm extends Component
         $this->sizes[] = '';
         $this->prices[] = '';
         $this->quantities[] = '';
+        $this->reorder_levels[] = '';
     }
 
     public function removeProductImage()
@@ -100,6 +107,7 @@ class EditProductForm extends Component
                     'size'           => $size,
                     'quantity_stock' => $this->quantities[$index] === '' ? null : $this->quantities[$index],
                     'price'          => $this->prices[$index] === '' ? null : $this->prices[$index],
+                    'reorder_level' => $this->reorder_levels[$index] === '' ? null : $this->reorder_levels[$index],
                 ];
             })->toArray(),
         ];

@@ -19,7 +19,7 @@ class CreateProductForm extends Component
     public $product_image;
 
     public array $sizes = [
-        ['name' => '', 'price' => '', 'quantity' => '']
+        ['name' => '', 'price' => '', 'quantity' => '', 'reorder_level' => '']
     ];
 
     public function rules() 
@@ -31,6 +31,7 @@ class CreateProductForm extends Component
             'sizes.*.name'          => 'required|string|max:100',
             'sizes.*.price'         => 'required|numeric|min:0|max:999999.99',
             'sizes.*.quantity'      => 'required|integer|min:0',
+            'sizes.*.reorder_level'      => 'required|integer|min:0',
             'product_image'         => 'nullable|image|max:2048|mimes:jpg,jpeg,png,webp',
         ];
 
@@ -43,12 +44,13 @@ class CreateProductForm extends Component
             'sizes.*.name.required' => 'Each size needs a name.',
             'sizes.*.price.required' => 'Each size needs a price.',
             'sizes.*.quantity.required' => 'Each size needs a quantity.',
+            'sizes.*.reorder_level.required' => 'Each size needs a reorder level.',
         ];
     }
 
     public function addSize()
     {
-        $this->sizes[] = ['name' => '', 'price' => '', 'quantity' => ''];
+        $this->sizes[] = ['name' => '', 'price' => '', 'quantity' => '', 'reorder_level' => ''];
     }
 
     public function removeSize($index)

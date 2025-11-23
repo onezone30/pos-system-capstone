@@ -14,6 +14,7 @@ class ProductPrices extends Model
         'product_id',
         'size',
         'price',
+        'reorder_level',
         'quantity_stock'
     ];
     
