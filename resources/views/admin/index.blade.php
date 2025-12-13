@@ -6,6 +6,21 @@
 
     <div>
 
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <!-- 7-Day Forecast Chart -->
+            <div class="bg-white dark:bg-gray-800 rounded-2xl p-5 border border-gray-100 dark:border-gray-700 shadow">
+                <h2 class="text-lg font-semibold text-gray-700 dark:text-gray-400 mb-2">7-Day Sales Forecast</h2>
+                <div id="forecast7DaysChart" class="h-64"></div>
+            </div>
+
+            <!-- 30-Day Forecast Chart -->
+            <div class="bg-white dark:bg-gray-800 rounded-2xl p-5 border border-gray-100 dark:border-gray-700 shadow">
+                <h2 class="text-lg font-semibold text-gray-700 dark:text-gray-400 mb-2">30-Day Sales Forecast</h2>
+                <div id="forecast30DaysChart" class="h-64"></div>
+            </div>
+        </div>
+
+
         {{-- Header --}}
         <h1 class="text-2xl font-bold text-gray-700 dark:text-gray-400 mb-4">Sales & Revenue Overview</h1>
 
@@ -212,6 +227,7 @@
         new ApexCharts(document.querySelector("#paymentMethodChart"), {
             chart: { type: 'donut', height: 250, foreColor: '#ffffff' },
             series: paymentSeries,
+            tooltip: { theme: 'dark' },
             labels: paymentLabels
         }).render();
 
@@ -238,4 +254,72 @@
             yaxis: { labels: { formatter: val => `₱${val}` } }
         }).render();
 	});
+
+
+
+    // $forecast7 = $forecast->forecastRevenueSeries(60, 7, 0.5);
+    // $forecast30 = $forecast->forecastRevenueSeries(60, 30, 0.5);
+
+    let forecast7Dates = @json($forecast7['dates']);   // ['2025-11-23', ...]
+    let forecast7Values = @json($forecast7['values']); // [123, 145, ...]
+
+    let forecast30Dates = @json($forecast30['dates']);   
+    let forecast30Values = @json($forecast30['values']); 
+
+    // ====== 7-Day Forecast Chart ======
+    let options7 = {
+        series: [{
+            name: "Predicted Sales",
+            data: forecast7Values
+        }],
+        chart: {
+            type: 'area',
+            height: 300,
+            zoom: { enabled: false },
+            foreColor: '#ffffff',
+        },
+        dataLabels: { enabled: false },
+        title: {
+            text: 'Predicted Daily Sales',
+            align: 'left'
+        },
+        labels: forecast7Dates,
+        xaxis: { type: 'datetime' },
+        yaxis: { opposite: false },
+        legend: { horizontalAlign: 'left' },
+        tooltip: { theme: 'dark' },
+        stroke: { width: 2, curve: 'smooth' },
+        markers: { size: 4 }
+    };
+    new ApexCharts(document.querySelector("#forecast7DaysChart"), options7).render();
+
+    // ====== 30-Day Forecast Chart ======
+    let options30 = {
+        series: [{
+            name: "Predicted Sales",
+            data: forecast30Values
+        }],
+        chart: {
+            type: 'area',
+            height: 300,
+            zoom: { enabled: false },
+            foreColor: '#ffffff',
+        },
+        dataLabels: { enabled: false },
+        title: {
+            text: 'Predicted Daily Sales',
+            align: 'left'
+        },
+        labels: forecast30Dates,
+        xaxis: { type: 'datetime' },
+        yaxis: { opposite: false },
+        legend: { horizontalAlign: 'left' },
+        tooltip: { theme: 'dark' },
+        stroke: { width: 2, curve: 'smooth' },
+        markers: { size: 4 }
+    };
+    new ApexCharts(document.querySelector("#forecast30DaysChart"), options30).render();
+
+
+
 </script>

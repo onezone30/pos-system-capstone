@@ -13,23 +13,33 @@
         </div>
 
         {{-- Quick Actions --}}
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
-            <a href="{{ route('cashier.orders') }}" class="btn-primary">View Orders</a>
-            <a href="{{ route('cashier.orders.create') }}" class="btn-primary">New Order</a>
+        <div class="flex gap-4 mt-6">
+            <a href="{{ route('cashier.orders') }}">
+                <x-button color="green">View Orders</x-button>
+            </a>
+            <a href="{{ route('cashier.orders.create') }}">
+                <x-button :loading="false">New Order</x-button>
+            </a>
         </div>
 
         {{-- Payment Breakdown --}}
-        <div class="bg-white dark:bg-gray-800 rounded-2xl p-5 mt-6 shadow">
+        <div class="bg-white dark:bg-gray-800 rounded-2xl p-5 mt-6 shadow-lg">
             <h2 class="text-lg font-semibold mb-2">Payment Methods Today</h2>
-            <div id="paymentMethodChart" class="h-64"></div>
+            @if ($paymentMethods->isEmpty())
+            <p class="text-center text-gray-500 dark:text-gray-400 text-sm">
+                No payment data available for today.
+            </p>
+            @else
+                <div id="paymentMethodChart" class="h-64"></div>
+            @endif
         </div>
 
         {{-- Recent Orders --}}
-        <div class="bg-white dark:bg-gray-800 rounded-2xl p-5 mt-6 shadow">
+        <div class="bg-white dark:bg-gray-800 rounded-2xl p-5 mt-6 shadow-lg">
             <h2 class="text-lg font-semibold mb-2">Recent Orders</h2>
             <table class="min-w-full text-sm">
                 <thead>
-                    <tr>
+                    <tr class="text-left text-xl font-extrabold uppercase ">
                         <th>Order ID</th>
                         <th>Customer</th>
                         <th>Total</th>
@@ -40,11 +50,11 @@
 					<tbody>
 						@forelse ($recentOrders as $o)
 								<tr>
-								<td>#ORD{{ $o->id }}</td>
-								<td>{{ $o->customer_name ?? 'Guest' }}</td>
-								<td>₱{{ number_format($o->total_amount, 2) }}</td>
-								<td>{{ $o->payment_method }}</td>
-								<td>{{ $o->created_at->format('h:i A') }}</td>
+                                    <td>#ORD{{ $o->id }}</td>
+                                    <td>{{ $o->customer_name ?? 'Guest' }}</td>
+                                    <td>₱{{ number_format($o->total_amount, 2) }}</td>
+                                    <td>{{ $o->payment_method }}</td>
+                                    <td>{{ $o->created_at->format('M d, Y, h:i A') }}</td>
 								</tr>
 						@empty
 								<tr>

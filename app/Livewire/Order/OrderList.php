@@ -79,8 +79,12 @@ class OrderList extends Component
             ->whereBetween('created_at', [$this->startDate, $this->endDate])
             ->whereNotNull('amount_paid');
 
-        if ($this->user) {
-            $query->where('user_id', $this->user);
+        if (auth()->user()->role === 'cashier') {
+            $query->where('user_id', auth()->id());
+        } else {
+            if ($this->user ) {
+                $query->where('user_id', $this->user);
+            }
         }
 
         $orders = $query->orderBy('created_at', $this->order)

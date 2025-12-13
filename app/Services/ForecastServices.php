@@ -84,8 +84,7 @@ class ForecastServices
 
     public function forecastRevenueSeries(int $historyDays = 60, int $horizon = 7, float $alpha = 0.5): array
     {
-        // Get historical sales: date => revenue
-        $historyOrders = \App\Models\Order::selectRaw('DATE(created_at) as date, SUM(total_amount) as total')
+        $history = \App\Models\Order::selectRaw('DATE(created_at) as date, SUM(total_amount) as total')
             ->where('created_at', '>=', now()->subDays($historyDays - 1))
             ->groupBy('date')
             ->orderBy('date')
@@ -94,41 +93,45 @@ class ForecastServices
             ->toArray();
 
         // Fill missing days
-        $history = [];
+        $series = [];
         for ($i = 0; $i < $historyDays; $i++) {
-            $d = Carbon::now()->subDays($historyDays - 1 - $i)->toDateString();
-            $history[$d] = $historyOrders[$d] ?? 0;
+            $d = now()->subDays($historyDays - 1 - $i)->toDateString();
+            $series[$d] = $history[$d] ?? 0;
         }
 
-        $dates = array_keys($history);
-        $totals = array_values($history);
+        $forecastValues = $this->expSmoothingSeries($series, $alpha, $horizon);
 
-        $forecastValues = $this->expForecast($history, $alpha, $horizon);
+        // Fix: assign array_keys to a variable before passing to end()
+        $keys = array_keys($series);
+        $lastDate = Carbon::parse(end($keys));
 
-        // forecast dates
-        $lastDate = Carbon::parse(end($dates));
         $forecastDates = [];
         for ($i = 1; $i <= $horizon; $i++) {
-            $forecastDates[] = $lastDate->copy()->addDays($i)->format('D M d');
+            $forecastDates[] = $lastDate->copy()->addDays($i)->format('Y-m-d');
         }
 
-        return [
-            'dates' => $forecastDates,
-            'values' => $forecastValues
-        ];
+        return ['dates' => $forecastDates, 'values' => $forecastValues];
     }
 
-    public function expSmoothingForecast(array $history, float $alpha = 0.3): float
+    public function expSmoothingSeries(array $history, float $alpha = 0.5, int $horizon = 7): array
     {
         $values = array_values($history);
-        if (empty($values)) return 0.0;
+        if (empty($values)) return array_fill(0, $horizon, 0.0);
 
         $s = $values[0]; // initial level
         foreach ($values as $x) {
             $s = $alpha * $x + (1 - $alpha) * $s;
         }
-        // Forecast for next period equals last smoothed value
-        return $s;
+
+        $forecast = [];
+        for ($h = 1; $h <= $horizon; $h++) {
+            // basic exponential smoothing projection
+            $forecast[] = $s;
+            // optionally include trend using simple difference
+            $s = $s; // keep it constant; can replace with Holt's method later
+        }
+
+        return $forecast;
     }
 
     /**
@@ -234,39 +237,35 @@ class ForecastServices
      *   'days_left' => float
      * ]
      */
-    public function predictStockOuts(int $horizon = 30, string $method = 'exp', array $opts = [], float $thresholdDays = 7): array
+    public function predictStockOuts(int $horizon = 30, float $alpha = 0.5, int $historyDays = 60, float $thresholdDays = 7): array
     {
         $results = [];
-
         $prices = ProductPrices::with('product')->get();
 
         foreach ($prices as $price) {
-            // get product-level history (aggregate by product)
-            $history = $this->dailyHistory($price->product_id, 60); // use 60 days default
+            // get product-level daily sales
+            $history = $this->dailyHistory($price->product_id, $historyDays);
 
-            // choose a one-day forecast (average of horizon or single forecast)
-            $fs = $this->forecastSeries($price->product_id, 60, 7, $method, $opts);
-            $forecastDaily = array_sum($fs['values']) / max(1, count($fs['values'])); // avg daily forecast over horizon
+            $forecast = $this->expSmoothingSeries($history, $alpha, $horizon);
+            $avgDaily = array_sum($forecast) / count($forecast);
 
-            if ($forecastDaily <= 0) continue; // can't predict depletion
+            if ($avgDaily <= 0) continue;
 
-            $daysLeft = $price->quantity_stock / $forecastDaily;
+            $daysLeft = $price->quantity_stock / $avgDaily;
 
             if ($daysLeft <= $thresholdDays) {
                 $results[] = [
-                    'product_id' => $price->product->id,
+                    'product_id' => $price->product_id,
                     'product' => $price->product->name,
                     'size' => $price->size,
                     'stock' => $price->quantity_stock,
-                    'forecast_daily' => round($forecastDaily, 3),
-                    'days_left' => round($daysLeft, 2)
+                    'forecast_daily' => round($avgDaily, 2),
+                    'days_left' => round($daysLeft, 2),
                 ];
             }
         }
 
-        // sort ascending by days_left
         usort($results, fn($a, $b) => $a['days_left'] <=> $b['days_left']);
-
         return $results;
     }
 }
