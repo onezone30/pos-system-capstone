@@ -92,6 +92,9 @@ class ForecastServices
             ->pluck('total', 'date')
             ->toArray();
 
+
+
+
         // Fill missing days
         $series = [];
         for ($i = 0; $i < $historyDays; $i++) {
@@ -99,7 +102,7 @@ class ForecastServices
             $series[$d] = $history[$d] ?? 0;
         }
 
-        $forecastValues = $this->expSmoothingSeries($series, $alpha, $horizon);
+        $forecastValues = $this->expSmoothingSeries($series, $horizon, $alpha, 0.2);
 
         // Fix: assign array_keys to a variable before passing to end()
         $keys = array_keys($series);
@@ -113,27 +116,48 @@ class ForecastServices
         return ['dates' => $forecastDates, 'values' => $forecastValues];
     }
 
-    public function expSmoothingSeries(array $history, float $alpha = 0.5, int $horizon = 7): array
+    public function expSmoothingSeries(array $history, int $horizon = 7, float $alpha = 0.5, float $beta = 0.3): array
     {
         $values = array_values($history);
-        if (empty($values)) return array_fill(0, $horizon, 0.0);
+        $n = count($values);
 
-        $s = $values[0]; // initial level
-        foreach ($values as $x) {
-            $s = $alpha * $x + (1 - $alpha) * $s;
+        // If not enough data to establish a trend, return flat line or zeros
+        if ($n < 2) {
+            return array_fill(0, $horizon, $n > 0 ? end($values) : 0);
         }
 
+        // 1. Initialize Level (L) and Trend (T)
+        // Level is the first value
+        $level = $values[0];
+        // Trend is the difference between the first two values (initial slope)
+        $trend = $values[1] - $values[0];
+
+        // 2. "Learn" the trend from history
+        // We start loop at index 1 because we already used index 0 for initialization
+        for ($i = 1; $i < $n; $i++) {
+            $lastLevel = $level;
+            $lastTrend = $trend;
+            $currentVal = $values[$i];
+
+            // Update Level: Alpha * Current + (1-Alpha) * (PrevLevel + PrevTrend)
+            $level = $alpha * $currentVal + (1 - $alpha) * ($lastLevel + $lastTrend);
+
+            // Update Trend: Beta * (NewLevel - PrevLevel) + (1-Beta) * PrevTrend
+            $trend = $beta * ($level - $lastLevel) + (1 - $beta) * $lastTrend;
+        }
+
+        // 3. Forecast future values
         $forecast = [];
         for ($h = 1; $h <= $horizon; $h++) {
-            // basic exponential smoothing projection
-            $forecast[] = $s;
-            // optionally include trend using simple difference
-            $s = $s; // keep it constant; can replace with Holt's method later
+            // The Formula: Forecast = Level + (StepsAhead * Trend)
+            $prediction = $level + ($h * $trend);
+
+            // Optional: Prevent negative sales predictions
+            $forecast[] = max(0, $prediction);
         }
 
         return $forecast;
     }
-
     /**
      * Linear regression forecast (least squares).
      * Returns forecast for next $horizon days as array of floats.
@@ -240,32 +264,53 @@ class ForecastServices
     public function predictStockOuts(int $horizon = 30, float $alpha = 0.5, int $historyDays = 60, float $thresholdDays = 7): array
     {
         $results = [];
-        $prices = ProductPrices::with('product')->get();
+        // Eager load product to avoid N+1 queries
+        $prices = \App\Models\ProductPrices::with('product')->get();
 
         foreach ($prices as $price) {
-            // get product-level daily sales
             $history = $this->dailyHistory($price->product_id, $historyDays);
 
-            $forecast = $this->expSmoothingSeries($history, $alpha, $horizon);
-            $avgDaily = array_sum($forecast) / count($forecast);
+            // Calculate forecast
+            $forecast = $this->expSmoothingSeries($history, $horizon, $alpha, 0.2);
 
-            if ($avgDaily <= 0) continue;
+            // 1. FIX: Prevent division by zero if forecast is empty
+            if (empty($forecast)) {
+                continue;
+            }
+
+            // Calculate average daily sales from forecast
+            $totalForecast = array_sum($forecast);
+            $count = count($forecast);
+
+            // 2. Extra safety: ensure count is > 0 (redundant if empty() check passes, but good practice)
+            if ($count === 0) {
+                continue;
+            }
+
+            $avgDaily = $totalForecast / $count;
+
+            // 3. Prevent division by zero in the stock calculation
+            // If predicted sales are 0 (or negative), we will never run out of stock.
+            if ($avgDaily <= 0.001) {
+                continue;
+            }
 
             $daysLeft = $price->quantity_stock / $avgDaily;
 
             if ($daysLeft <= $thresholdDays) {
                 $results[] = [
                     'product_id' => $price->product_id,
-                    'product' => $price->product->name,
+                    'product' => $price->product->name ?? 'Unknown',
                     'size' => $price->size,
                     'stock' => $price->quantity_stock,
                     'forecast_daily' => round($avgDaily, 2),
-                    'days_left' => round($daysLeft, 2),
+                    'days_left' => round($daysLeft, 1),
                 ];
             }
         }
 
         usort($results, fn($a, $b) => $a['days_left'] <=> $b['days_left']);
+
         return $results;
     }
 }

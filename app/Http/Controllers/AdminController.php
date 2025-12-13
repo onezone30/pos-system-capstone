@@ -22,7 +22,7 @@ class AdminController extends Controller
 
         // ===== BASIC METRICS =====
         $todaySales   = Order::whereDate('created_at', today())->sum('amount_paid');
-        $weekSales    = Order::whereBetween('created_at', [now()->startOfWeek(), now()->endOfWeek()])->sum('amount_paid');
+        $weekSales    = Order::whereBetween('createdSS_at', [now()->startOfWeek(), now()->endOfWeek()])->sum('amount_paid');
         $monthSales   = Order::whereMonth('created_at', now()->month)->sum('amount_paid');
         $grossRevenue = Order::sum('amount_paid');
         $averageTransaction = Order::avg('amount_paid');
@@ -69,7 +69,7 @@ class AdminController extends Controller
 
         // ===== FORECASTING =====
         $overallForecast = $forecast->forecastRevenueSeries(historyDays: 60, horizon: 7, alpha: 0.5);
-        
+
 
         $forecastLabels = $overallForecast['dates'];
         $forecastData   = $overallForecast['values'];
