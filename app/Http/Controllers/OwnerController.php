@@ -17,6 +17,9 @@ class OwnerController extends Controller
     {
         $user = Auth::user();
 
+        $forecast7 = $forecast->forecastRevenueSeries(60, 7, 0.5);
+        $forecast30 = $forecast->forecastRevenueSeries(60, 30, 0.5);
+
         // ===== BASIC METRICS =====
         $todaySales   = Order::whereDate('created_at', today())->sum('amount_paid');
         $weekSales    = Order::whereBetween('created_at', [now()->startOfWeek(), now()->endOfWeek()])->sum('amount_paid');
@@ -67,15 +70,15 @@ class OwnerController extends Controller
         // ===== FORECASTING =====
         $overallForecast = $forecast->forecastRevenueSeries(historyDays: 60, horizon: 7, alpha: 0.5);
 
+
         $forecastLabels = $overallForecast['dates'];
         $forecastData   = $overallForecast['values'];
 
-        // Stock-out predictions
         $forecastedStockOuts = $forecast->predictStockOuts(
-            horizon: 30,
-            method: 'exp',
-            opts: ['alpha' => 0.25],
-            thresholdDays: 7
+            30,    // horizon
+            0.25,  // alpha
+            60,    // historyDays
+            7      // thresholdDays
         );
         $forecastedStockOutCount = count($forecastedStockOuts);
 
@@ -113,6 +116,8 @@ class OwnerController extends Controller
             'overallForecast' => $overallForecast,
             'forecastedStockOuts' => $forecastedStockOuts,
             'forecastedStockOutCount' => $forecastedStockOutCount,
+            'forecast7' => $forecast7,
+            'forecast30' => $forecast30
         ])->with([
             'type' => 'success',
             'message' => 'Dashboard loaded'
