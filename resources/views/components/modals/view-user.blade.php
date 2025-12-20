@@ -1,6 +1,33 @@
-<!-- Main modal -->
 <div
-    x-data="{ open: false, id: '', name: '', role: '', email: '', profile_image: '', email_verified_at: '', created_at: '', updated_at: ''}"
+    x-data="{ 
+        open: false, 
+        id: '', 
+        name: '', 
+        role: '', 
+        email: '', 
+        profile_image: '', 
+        email_verified_at: '', 
+        created_at: '', 
+        updated_at: '',
+        
+        // --- UPDATED DATA VARIABLES ---
+        order_count: '15', 
+        total_spent: '7,500.00', 
+        last_order_date: '2025-12-10 14:30:00',
+        total_customers_catered: '120', // <<< NEW VARIABLE ADDED
+        
+        formatDate(dateString) {
+            if (!dateString) return 'N/A';
+            const date = new Date(dateString);
+            return date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+        },
+        getRoleColor(r) {
+            r = r.toLowerCase();
+            if (r.includes('admin') || r.includes('administrator')) return 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300';
+            if (r.includes('manager') || r.includes('cashier')) return 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300'; // Adjusted for Cashier
+            return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300';
+        }
+    }"
     x-on:open-view-modal.window="
         id = $event.detail.id; 
         name = $event.detail.name; 
@@ -10,155 +37,136 @@
         email_verified_at = $event.detail.email_verified_at; 
         created_at = $event.detail.created_at; 
         updated_at = $event.detail.updated_at; 
-        open = true"
+        
+        // --- Placeholder Data assignment (if you update your dispatch event) ---
+        order_count = $event.detail.order_count ?? this.order_count; 
+        total_spent = $event.detail.total_spent ?? this.total_spent; 
+        last_order_date = $event.detail.last_order_date ?? this.last_order_date; 
+        total_customers_catered = $event.detail.total_customers_catered ?? this.total_customers_catered; // <<< NEW DATA ASSIGNMENT
+        
+        open = true;
+    "
     x-on:close-view-modal.window="open = false"
     x-show="open"
-    x-transition
+    x-transition:enter="transition ease-out duration-300"
+    x-transition:enter-start="opacity-0 scale-90"
+    x-transition:enter-end="opacity-100 scale-100"
+    x-transition:leave="transition ease-in duration-200"
+    x-transition:leave-start="opacity-100 scale-100"
+    x-transition:leave-end="opacity-0 scale-90"
     x-cloak
     wire:ignore.self
-    x-on:click="open = false"
-    class="overflow-y-auto overflow-x-hidden fixed py-6 top-0 right-0 left-0 z-50 flex justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full"
+    x-on:click.self="open = false"
+    class="fixed inset-0 z-50 flex justify-center items-center p-4 bg-gray-900/50 dark:bg-gray-900/70"
 >
-    <div class="relative w-full max-w-2xl max-h-full">
-        <!-- Modal content -->
-        <div class="px-4 py-2 relative bg-white rounded-lg shadow-sm dark:bg-gray-700 ">
-            <!-- Modal header -->
-            <div class="flex items-center justify-between p-4 md:p-5 border-b rounded-t dark:border-gray-600 border-gray-200">
-                <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
-                    User Information
+    <div x-on:click.stop class="relative w-full max-w-xl max-h-full">
+        <div class="relative bg-white dark:bg-gray-800 rounded-xl shadow-2xl overflow-y-auto max-h-[90vh]">
+            
+            <div class="sticky top-0 z-10 flex items-center justify-between p-5 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800/95 backdrop-blur-sm">
+                <h3 class="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                    <svg class="w-5 h-5 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+                    User Profile: <span class="text-indigo-600 dark:text-indigo-400" x-text="name"></span>
                 </h3>
                 <button 
                     type="button" 
-                    class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white"
+                    class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 dark:hover:bg-gray-700 dark:hover:text-white rounded-lg text-sm w-8 h-8 inline-flex justify-center items-center transition"
                     x-on:click="open = false"
                 >
-                    <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
-                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"/>
-                    </svg>
+                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
                     <span class="sr-only">Close modal</span>
                 </button>
             </div>
 
-            <!-- Modal body -->
-            <!-- Profile Image Section -->
-            <div class="flex justify-center mb-6">
-                <div class="relative">
-                    <template x-if="profile_image">
+            <div class="p-6 space-y-6">
+                
+                <div class="flex flex-col items-center space-y-4 pb-4 border-b border-gray-100 dark:border-gray-700">
+                    <div class="relative">
                         <img 
-                            :src="'/storage/' + profile_image" 
-                            :alt="name + `'s Profile`" 
-                            class="w-24 h-24 rounded-full object-cover border-4 border-gray-200 dark:border-gray-600 shadow-lg"
+                            :src="profile_image ? ('/storage/' + profile_image) : '{{ asset('storage/images/profiles/default.jpg') }}'" 
+                            :alt="name + ' Profile'" 
+                            class="w-32 h-32 rounded-full object-cover border-4 border-indigo-200 dark:border-indigo-900 shadow-xl"
                         >
-                    </template>
-                    <template x-if="!profile_image">
-                        <div class="w-24 h-24 rounded-full bg-gray-300 dark:bg-gray-600 border-4 border-gray-200 dark:border-gray-600 shadow-lg flex items-center justify-center">
-                            <svg class="w-12 h-12 text-gray-400 dark:text-gray-500" fill="currentColor" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"></path>
-                            </svg>
+                        
+                        <div class="mt-3 text-center">
+                             <span 
+                                class="inline-flex items-center px-3 py-1 rounded-full text-sm font-bold capitalize"
+                                :class="getRoleColor(role)"
+                                x-text="role || 'N/A'"
+                            ></span>
                         </div>
-                    </template>
-                    
-                    <!-- Role indicator badge -->
-                    <template x-if="role === 'admin'">
-                        <div class="absolute bottom-0 right-0 w-6 h-6 bg-purple-500 border-2 border-white dark:border-gray-700 rounded-full flex items-center justify-center">
-                            <svg class="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z" clip-rule="evenodd"></path>
-                            </svg>
-                        </div>
-                    </template>
-
-                    <template x-if="role === 'cashier'">
-                        <div class="absolute bottom-0 right-0 w-6 h-6 bg-blue-500 border-2 border-white dark:border-gray-700 rounded-full flex items-center justify-center">
-                            <svg class="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
-                                <path d="M4 4a2 2 0 00-2 2v1h16V6a2 2 0 00-2-2H4z"></path>
-                                <path fill-rule="evenodd" d="M18 9H2v5a2 2 0 002 2h12a2 2 0 002-2V9zM4 13a1 1 0 011-1h1a1 1 0 110 2H5a1 1 0 01-1-1zm5-1a1 1 0 100 2h1a1 1 0 100-2H9z" clip-rule="evenodd"></path>
-                            </svg>
-                        </div>
-                    </template>
-
-                    <template x-if="role !== 'admin' && role !== 'cashier'">
-                        <div class="absolute bottom-0 right-0 w-6 h-6 bg-green-500 border-2 border-white dark:border-gray-700 rounded-full flex items-center justify-center">
-                            <svg class="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"></path>
-                            </svg>
-                        </div>
-                    </template>
+                    </div>
                 </div>
+
+                <h4 class="text-lg font-semibold text-gray-900 dark:text-white">General Information</h4>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 border p-4 rounded-lg bg-gray-50 dark:bg-gray-700/30">
+                    
+                    <div class="flex flex-col">
+                        <span class="text-xs uppercase text-gray-500 dark:text-gray-400 font-medium">Full Name</span>
+                        <span class="text-base font-semibold text-gray-800 dark:text-gray-200" x-text="name"></span>
+                    </div>
+
+                    <div class="flex flex-col">
+                        <span class="text-xs uppercase text-gray-500 dark:text-gray-400 font-medium">Email Address</span>
+                        <a :href="'mailto:' + email" class="text-base text-blue-600 dark:text-blue-400 hover:underline truncate" x-text="email"></a>
+                    </div>
+                    
+                    <div class="flex flex-col">
+                        <span class="text-xs uppercase text-gray-500 dark:text-gray-400 font-medium">Email Verified</span>
+                        <template x-if="email_verified_at">
+                            <span class="inline-flex items-center text-sm font-medium text-green-600 dark:text-green-400">Verified</span>
+                        </template>
+                        <template x-if="!email_verified_at">
+                            <span class="inline-flex items-center text-sm font-medium text-yellow-600 dark:text-yellow-400">Pending</span>
+                        </template>
+                    </div>
+
+                    <div class="flex flex-col">
+                        <span class="text-xs uppercase text-gray-500 dark:text-gray-400 font-medium">Member Since</span>
+                        <span class="text-sm text-gray-800 dark:text-gray-200" x-text="formatDate(created_at)"></span>
+                    </div>
+
+                </div>
+
+                <h4 class="text-lg font-semibold text-gray-900 dark:text-white pt-4">Business Metrics</h4>
+                <div class="grid grid-cols-2 gap-4 text-center">
+                    
+                    <div class="p-3 rounded-lg bg-indigo-50 dark:bg-indigo-900/20 shadow-sm border border-indigo-100 dark:border-indigo-900">
+                        <span class="text-2xl font-extrabold text-indigo-600 dark:text-indigo-400" x-text="order_count"></span>
+                        <p class="text-xs uppercase text-gray-500 dark:text-gray-400 mt-1">Total Orders</p>
+                    </div>
+
+                    <div class="p-3 rounded-lg bg-green-50 dark:bg-green-900/20 shadow-sm border border-green-100 dark:border-green-900">
+                        <span class="text-2xl font-extrabold text-green-600 dark:text-green-400">$<span x-text="total_spent"></span></span>
+                        <p class="text-xs uppercase text-gray-500 dark:text-gray-400 mt-1">Total Spent</p>
+                    </div>
+
+                    <div class="p-3 rounded-lg bg-blue-50 dark:bg-blue-900/20 shadow-sm border border-blue-100 dark:border-blue-900">
+                        <span class="text-2xl font-extrabold text-blue-600 dark:text-blue-400" x-text="total_customers_catered"></span>
+                        <p class="text-xs uppercase text-gray-500 dark:text-gray-400 mt-1">Customers Catered</p>
+                    </div>
+                    
+                    <div class="p-3 rounded-lg bg-yellow-50 dark:bg-yellow-900/20 shadow-sm border border-yellow-100 dark:border-yellow-900">
+                        <span class="text-base font-semibold text-yellow-600 dark:text-yellow-400" x-text="formatDate(last_order_date)"></span>
+                        <p class="text-xs uppercase text-gray-500 dark:text-gray-400 mt-1">Last Order Date</p>
+                    </div>
+
+                </div>
+
             </div>
 
-            <!-- User Details Table -->
-            <div class="overflow-x-auto">
-                <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
-                    <tbody>
-                        <tr class="border-b border-gray-200 dark:border-gray-600">
-                            <td class="px-4 py-3 font-medium text-gray-900 dark:text-white w-1/3">
-                                Full Name
-                            </td>
-                            <td class="px-4 py-3" x-text="name"></td>
-                        </tr>
-                        <tr class="border-b border-gray-200 dark:border-gray-600">
-                            <td class="px-4 py-3 font-medium text-gray-900 dark:text-white">
-                                Email Address
-                            </td>
-                            <td class="px-4 py-3">
-                                <a :href="'mailto:' + email" class="text-blue-600 dark:text-blue-400 hover:underline" x-text="email"></a>
-                            </td>
-                        </tr>
-                        <tr class="border-b border-gray-200 dark:border-gray-600">
-                            <td class="px-4 py-3 font-medium text-gray-900 dark:text-white">
-                                Role
-                            </td>
-                            <td class="px-4 py-3">
-                                <span x-show="role === 'admin'" class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-300">
-                                    Administrator
-                                </span>
-                                <span x-show="role === 'cashier'" class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300">
-                                    Cashier
-                                </span>
-                                <span x-show="role !== 'admin' && role !== 'cashier'" class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300">
-                                    Customer
-                                </span>
-                            </td>
-                        </tr>
-                        <tr class="border-b border-gray-200 dark:border-gray-600">
-                            <td class="px-4 py-3 font-medium text-gray-900 dark:text-white">
-                                Email Verified
-                            </td>
-                            <td class="px-4 py-3">
-                                <template x-if="email_verified_at">
-                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300">
-                                        Verified
-                                    </span>
-                                </template>
-                                <template x-if="!email_verified_at">
-                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300">
-                                        Pending Verification
-                                    </span>
-                                </template>
-                            </td>
-                        </tr>
-                        <tr class="border-b border-gray-200 dark:border-gray-600">
-                            <td class="px-4 py-3 font-medium text-gray-900 dark:text-white">
-                                Member Since
-                            </td>
-                            <td class="px-4 py-3" x-text="created_at"></td>
-                        </tr>
-                        <tr>
-                            <td class="px-4 py-3 font-medium text-gray-900 dark:text-white">
-                                Last Updated
-                            </td>
-                            <td class="px-4 py-3" x-text="updated_at"></td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-
-            <!-- User ID Section (Optional) -->
-            <div class="mt-6 text-center">
+            <div class="flex items-center justify-between p-4 md:p-5 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 rounded-b-xl">
                 <span class="text-xs text-gray-500 dark:text-gray-400">
-                    User ID: <span x-text="id"></span>
+                    User ID: <span x-text="id"></span> | Last updated: <span x-text="formatDate(updated_at)"></span>
                 </span>
+                <button 
+                    x-on:click="open = false" 
+                    type="button" 
+                    class="text-white bg-indigo-600 hover:bg-indigo-700 focus:ring-4 focus:outline-none focus:ring-indigo-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-indigo-600 dark:hover:bg-indigo-700 dark:focus:ring-indigo-800 transition"
+                >
+                    Close
+                </button>
             </div>
+            
         </div>
     </div>
 </div>

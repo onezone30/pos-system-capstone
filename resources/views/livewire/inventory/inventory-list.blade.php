@@ -3,29 +3,33 @@
     @inventory-filter.window="updateFilter($event.detail)"
     @product-search.window="search = $event.detail"
     class="relative overflow-x-auto shadow-md sm:rounded-lg pb-4">
-    <!-- Stats Cards -->
-    <div class="grid grid-cols-4 gap-4 mb-4">
-        <div class="p-4 bg-green-100 dark:bg-green-800 rounded-lg shadow">
-            <p class="text-sm text-gray-600 dark:text-gray-300">Total Products</p>
-            <p class="text-2xl font-bold text-green-700 dark:text-green-200">
+    
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 mb-6">
+        
+        <div class="p-3 sm:p-4 bg-green-50 dark:bg-green-900/50 rounded-xl shadow-md border border-green-100 dark:border-green-900">
+            <p class="text-xs sm:text-sm font-medium text-green-700 dark:text-green-300 mb-1">Total Products</p>
+            <p class="text-xl md:text-2xl font-extrabold text-green-800 dark:text-green-200 truncate">
                 {{ $products->total() }}
             </p>
         </div>
-        <div class="p-4 bg-red-100 dark:bg-red-800 rounded-lg shadow">
-            <p class="text-sm text-gray-600 dark:text-gray-300">Low Stock</p>
-            <p class="text-2xl font-bold text-red-700 dark:text-red-200">
+
+        <div class="p-3 sm:p-4 bg-red-50 dark:bg-red-900/50 rounded-xl shadow-md border border-red-100 dark:border-red-900">
+            <p class="text-xs sm:text-sm font-medium text-red-700 dark:text-red-300 mb-1">Low Stock Items</p>
+            <p class="text-xl md:text-2xl font-extrabold text-red-800 dark:text-red-200 truncate">
                 {{ $lowStockCount ?? 0 }}
             </p>
         </div>
-        <div class="p-4 bg-yellow-100 dark:bg-yellow-800 rounded-lg shadow">
-            <p class="text-sm text-gray-600 dark:text-gray-300">Categories</p>
-            <p class="text-2xl font-bold text-yellow-700 dark:text-yellow-200">
+
+        <div class="p-3 sm:p-4 bg-yellow-50 dark:bg-yellow-900/50 rounded-xl shadow-md border border-yellow-100 dark:border-yellow-900">
+            <p class="text-xs sm:text-sm font-medium text-yellow-700 dark:text-yellow-300 mb-1">Total Categories</p>
+            <p class="text-xl md:text-2xl font-extrabold text-yellow-800 dark:text-yellow-200 truncate">
                 {{ \App\Models\Category::count() }}
             </p>
         </div>
-        <div class="p-4 bg-blue-100 dark:bg-blue-800 rounded-lg shadow">
-            <p class="text-sm text-gray-600 dark:text-gray-300">Variants</p>
-            <p class="text-2xl font-bold text-blue-700 dark:text-blue-200">
+
+        <div class="p-3 sm:p-4 bg-blue-50 dark:bg-blue-900/50 rounded-xl shadow-md border border-blue-100 dark:border-blue-900">
+            <p class="text-xs sm:text-sm font-medium text-blue-700 dark:text-blue-300 mb-1">Product Variants</p>
+            <p class="text-xl md:text-2xl font-extrabold text-blue-800 dark:text-blue-200 truncate">
                 {{ $products->sum(fn($p) => $p->prices->count()) }}
             </p>
         </div>
@@ -59,20 +63,23 @@
                         data-name="{{ $product->name }}"
                         data-category="{{ $product->category->id }}"
                         data-stock="{{ $price->quantity_stock }}"
-                        data-level="{{ $product->reorder_level }}"
+                        data-level="{{ $price->reorder_level }}"
                     >
                         <td class="px-6 py-4">{{ $product->name }}</td>
                         <td class="px-6 py-4">{{ $product->category->name }}</td>
                         <td class="px-6 py-4">{{ $price->size ?? 'N/A' }}</td>
                         <td class="px-6 py-4">
                             <span 
-                                class="
-                                    px-2 py-1 rounded text-white text-xs font-semibold
-                                    @if($price->quantity_stock <= $product->reorder_level) bg-red-600
-                                    @elseif($price->quantity_stock > $product->reorder_level && $price->quantity_stock <= ($product->reorder_level * 3)) bg-yellow-500
-                                    @else bg-green-600
+                                class="px-2 py-1 rounded text-white text-xs font-semibold whitespace-nowrap
+                                    @if($price->quantity_stock <= $price->reorder_level) 
+                                        bg-red-600 dark:bg-red-500
+                                    @elseif($price->quantity_stock <= ($price->reorder_level * 3)) 
+                                        bg-yellow-500 dark:bg-yellow-400
+                                    @else 
+                                        bg-green-600 dark:bg-green-500
                                     @endif
-                                ">
+                                "
+                            >
                                 {{ $price->quantity_stock }}
                             </span>
                         </td>

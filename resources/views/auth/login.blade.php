@@ -2,12 +2,14 @@
 
     <x-nav />
 
+    @guest
+
     <main class="mt-14 max-w-[668px] mx-auto px-6">
 
         <div class="p-6 bg-gray-800 rounded-lg">
 
             <h1 class="mb-8 font-bold text-4xl text-center">
-                Login
+                Welcome Back!
             </h1>
 
             <x-forms.form method="POST" action="{{ route('login.store') }}">
@@ -37,6 +39,7 @@
 
     </main>
 
+    @endguest
 
 
 

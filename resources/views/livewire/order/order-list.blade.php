@@ -12,11 +12,13 @@
                 <th class="px-6 py-3">
                     @if (auth()->user()->role !== 'cashier')
                         Action
+                    @else
+                        Details
                     @endif
                 </th>
             </tr>
         </thead>
-            <tbody>
+        <tbody>
             @if ($orders->count() > 0)
                 @foreach ($orders as $order)
                     <tr class="text-center bg-white border-b dark:bg-gray-800 dark:border-gray-700 border-gray-200 hover:bg-gray-50 dark:hover:bg-gray-600">
@@ -54,10 +56,20 @@
                             </div>
                         </td>
                         <td class="px-6 py-4">
-                            @if (auth()->user()->role !== 'cashier')
-                                <div class="flex justify-center gap-1.5">
+                            <div class="flex justify-center gap-1.5">
+                                <x-button 
+                                    @click="window.open('{{ route('orders.print', $order->id) }}', '_blank')" 
+                                    color="green"
+                                    size="sm"
+                                    title="View / Print Receipt"
+                                >
+                                    <i class="ph ph-printer text-lg"></i> 
+                                </x-button>
+
+                                @if (auth()->user()->role !== 'cashier')
                                     <x-button
                                         @click="$dispatch('open-edit-modal', {id: {{ $order->id }}})"
+                                        size="sm"
                                     >
                                         Edit
                                     </x-button>
@@ -65,11 +77,12 @@
                                     <x-button 
                                         @click="$dispatch('open-delete-modal', {id: {{ $order->id }}})"
                                         color="red"
+                                        size="sm"
                                     >
                                         Delete
                                     </x-button>
-                                </div>
-                            @endif
+                                @endif
+                            </div>
                         </td>
                     </tr>
                 @endforeach
@@ -79,7 +92,7 @@
                         No Orders
                     </th>
                 </tr>
-            @endforelse
+            @endif
         </tbody>
     </table>
 
@@ -87,8 +100,7 @@
         {{ $orders->links() }}
     </div>
 
-    <!-- Modals -->
-    <x-modals.edit><livewire:order.edit-order-form /></x-modals.edit>
+    <livewire:order.edit-order-form />
     <x-modals.view-order />
     <x-modals.delete />
 </div>

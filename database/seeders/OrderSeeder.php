@@ -23,8 +23,7 @@ class OrderSeeder extends Seeder
             return;
         }
 
-        // Create 50 random orders
-        for ($i = 0; $i < 50; $i++) {
+        for ($i = 0; $i < 20; $i++) {
             $user = $users->random();
 
             $order = Order::create([
@@ -38,7 +37,6 @@ class OrderSeeder extends Seeder
                 'updated_at' => now()
             ]);
 
-            // Pick 1–5 random product sizes for this order
             $orderProducts = $products->random(rand(1, 5));
             $total = 0;
 
@@ -55,7 +53,6 @@ class OrderSeeder extends Seeder
                     continue;
                 }
 
-                // Create order item
                 OrderItems::create([
                     'order_id' => $order->id,
                     'product_id' => $price->product_id,
@@ -67,7 +64,6 @@ class OrderSeeder extends Seeder
 
                 $total += $subtotal;
 
-                // Create sales history
                 SalesHistory::create([
                     'order_id' => $order->id,
                     'product_id' => $price->product_id,
@@ -77,11 +73,9 @@ class OrderSeeder extends Seeder
                 ]);
 
 
-                // Deduct stock
                 $price->decrement('quantity_stock', $quantity);
             }
 
-            // Update order totals
             $order->update([
                 'total_amount' => $total,
                 'amount_paid' => $total,

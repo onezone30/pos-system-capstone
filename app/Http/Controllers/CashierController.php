@@ -12,7 +12,6 @@ class CashierController extends Controller
     {
         $user = Auth::user();
 
-        // Today’s totals
         $todaysSales = Order::where('user_id', $user->id)
             ->whereDate('created_at', today())
             ->sum('total_amount');
@@ -25,19 +24,17 @@ class CashierController extends Controller
             ->whereDate('created_at', today())
             ->avg('total_amount');
 
-        // Recent Orders
         $recentOrders = Order::where('user_id', $user->id)
             ->latest()
             ->take(8)
             ->get();
 
-                // ===== PAYMENT METHODS =====
         $paymentMethods = Order::selectRaw('payment_method, COUNT(*) as total')
+            ->where('user_id', $user->id)
             ->whereDate('created_at', today())
             ->groupBy('payment_method')
             ->get();
 
-        // Payment breakdown
         $paymentBreakdown = Order::where('user_id', $user->id)
             ->whereDate('created_at', today())
             ->selectRaw('payment_method, COUNT(*) as count')

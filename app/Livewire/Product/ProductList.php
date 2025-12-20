@@ -13,10 +13,10 @@ class ProductList extends Component
     use WithPagination;
 
 
-    #[On(['editProduct', 'createProduct'])]
+    #[On('editProduct', 'createProduct')]
     public function refreshPage()
     {
-        $this->reset();
+        $this->resetPage();
     }
 
     public function delete(int $id)
@@ -24,19 +24,23 @@ class ProductList extends Component
         $product = Product::findOrFail($id);
         
         if(! $product->delete()) {
-            $this->dispatch('toast.success', message: "Failed to delete {$product->name}");
+            $this->dispatch('toast.error', message: "Failed to delete {$product->name}");
+            return;
         }
 
-        $this->refreshPage();
+        $this->refreshPage(); 
+
         $this->dispatch('toast.success', message: "{$product->name} has been deleted");
         $this->dispatch('close-delete-modal');
     }
 
     public function render()
-    {            
-        $products = Product::with('category')->get();
-        $categories = Category::query()
-            ->get();
+    { 
+        $products = Product::with('category')
+            ->orderBy('id', 'desc') 
+            ->paginate(10); 
+            
+        $categories = Category::query()->get();
 
         return view('livewire.product.product-list', [
             'products' => $products,

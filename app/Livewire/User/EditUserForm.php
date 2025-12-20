@@ -67,6 +67,8 @@ class EditUserForm extends Component
             'profile_image' => $this->profile_image instanceof TemporaryUploadedFile
                                 ? $this->profile_image
                                 : $this->user->profile_image,
+            'password' => $this->password,
+            'password_confirmation' => $this->password_confirmation,
         ];
 
         if(! $userServices->update($this->user, $userData)) {

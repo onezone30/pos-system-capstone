@@ -1,6 +1,6 @@
-<div class="group relative flex flex-col h-[400px] bg-white border border-gray-100 rounded-2xl shadow-md hover:shadow-xl dark:bg-gray-800 dark:border-gray-700 transition-all duration-300 hover:-translate-y-1 overflow-hidden">
-    <!-- Image -->
-    <div class="h-1/2 relative overflow-hidden bg-gray-50 dark:bg-gray-700 flex justify-center items-center">
+<div class="group relative flex flex-col h-[400px] bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-0.5 overflow-hidden">
+    
+    <div class="h-3/5 relative overflow-hidden bg-gray-50 dark:bg-gray-700/50 flex justify-center items-center p-3">
         @if ($product->product_image === null)
             <img 
                 class="w-full h-full object-cover rounded-xl group-hover:scale-105 transition-transform duration-300"
@@ -9,11 +9,15 @@
             />
         @else
             <img 
-                class="w-full h-full object-cover rounded-xl group-hover:scale-105 transition-transform duration-300"
+                class="w-full h-full object-contain group-hover:scale-105 transition-transform duration-300 rounded-lg"
                 src="{{ asset('storage/' . $product->product_image) }}"
                 alt="{{ $product->name }}" 
             />
         @endif
+        
+        <span class="absolute top-3 left-3 px-3 py-1 text-xs font-bold text-white bg-indigo-500 rounded-full shadow-md">
+            {{ $product->category->name ?? 'Uncategorized' }}
+        </span>
     </div>
 
     <!-- Content -->
@@ -56,7 +60,4 @@
             @endif
         </div>
     </div>
-
-    <!-- Subtle overlay -->
-    <div class="absolute inset-0 bg-gradient-to-t from-transparent to-transparent group-hover:from-indigo-50/10 group-hover:to-transparent transition-all duration-300 pointer-events-none rounded-2xl"></div>
 </div>

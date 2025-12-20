@@ -38,8 +38,10 @@ class ForgotPasswordController extends Controller
                 'type' => 'success'
             ]);
         } catch (Exception $e) {
-            Log::error('Password reset error: ' . $e->getMessage());
-            throw $e; // temporarily throw to see the real error
+            return redirect()->back()->with('toast', [
+                'message' => "Email address not found",
+                'type' => 'error'
+            ]);
         }
     }
 }

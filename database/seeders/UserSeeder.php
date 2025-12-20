@@ -19,13 +19,6 @@ class UserSeeder extends Seeder
             'role' => 'admin',
             'password' => 'admin',
         ]);
-
-        User::create([
-            'name' => 'Cesar Pinero',
-            'email' => 'cpinero522003@gmail.com',
-            'role' => 'admin',
-            'password' => 'admin'
-        ]);
         
         User::create([
             'name' => 'owner',
@@ -40,11 +33,5 @@ class UserSeeder extends Seeder
             'role' => 'cashier',
             'password' => 'cashier',
         ]);
-
-
-        User::factory(3)->admin()->create(['password' => 'password']);
-        User::factory(3)->cashier()->create(['password' => 'password']);
-        User::factory(3)->owner()->create(['password' => 'password']);
-
     }
 }

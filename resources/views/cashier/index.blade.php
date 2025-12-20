@@ -5,24 +5,18 @@
 
     <div>
 
-        {{-- Summary Cards --}}
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
             <x-dashboard-card title="Today's Sales" value="₱{{ number_format($todaysSales, 2) }}" />
             <x-dashboard-card title="Transactions Today" value="{{ $todaysTransactions }}" />
             <x-dashboard-card title="Average Transaction" value="₱{{ number_format($avgTransaction, 2) }}" />
         </div>
 
-        {{-- Quick Actions --}}
         <div class="flex gap-4 mt-6">
             <a href="{{ route('cashier.orders') }}">
                 <x-button color="green">View Orders</x-button>
             </a>
-            <a href="{{ route('cashier.orders.create') }}">
-                <x-button :loading="false">New Order</x-button>
-            </a>
         </div>
 
-        {{-- Payment Breakdown --}}
         <div class="bg-white dark:bg-gray-800 rounded-2xl p-5 mt-6 shadow-lg">
             <h2 class="text-lg font-semibold mb-2">Payment Methods Today</h2>
             @if ($paymentMethods->isEmpty())
@@ -34,7 +28,6 @@
             @endif
         </div>
 
-        {{-- Recent Orders --}}
         <div class="bg-white dark:bg-gray-800 rounded-2xl p-5 mt-6 shadow-lg">
             <h2 class="text-lg font-semibold mb-2">Recent Orders</h2>
             <table class="min-w-full text-sm">

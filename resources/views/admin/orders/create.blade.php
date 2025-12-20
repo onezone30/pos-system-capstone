@@ -3,25 +3,29 @@
 
     <div 
         x-data="{ search: '' }"
-        class="flex justify-between items-center mb-4"
+        class="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-6 gap-3 sm:gap-4"
     >
-        <!-- Search Input -->
-        <x-forms.input 
-            x-model="search"
-            @input="$dispatch('product-search', search)"
-            placeholder="Search products..." 
-        />            
+        <div class="flex-1 w-full sm:w-auto">
+             <x-forms.input 
+                x-model.debounce.500ms="search"
+                @input="$dispatch('product-search', search)"
+                placeholder="Search products by name..." 
+            />
+        </div>
 
-        <!-- Cart Button -->
         <x-button
             x-data="{ count: 0 }"
             x-on:cart-count-update.window="count = $event.detail.count" 
             x-on:click="$dispatch('open-create-modal')"
+            class="w-full sm:w-auto justify-center sm:justify-start py-3"
         >
+            <i class="ph ph-shopping-cart text-xl me-2"></i>
             Check Cart
             <span
                 x-text="count" 
-                class="inline-flex items-center justify-center w-4 h-4 ms-2 text-xs font-semibold text-blue-800 bg-blue-200 rounded-full">
+                :class="count > 0 ? 'bg-indigo-600' : 'bg-gray-400'"
+                class="inline-flex items-center justify-center w-5 h-5 ms-2 text-xs font-semibold text-white rounded-full transition-colors duration-200"
+            >
             </span>
         </x-button>
 
@@ -30,7 +34,7 @@
 
     <div 
         x-data="{
-            order: '',
+            order: 'asc', 
             category: '',
             stock: '',
 
@@ -41,14 +45,14 @@
                     stock: this.stock,
                 });
             }
-        }
-        "
+        }"
+        x-init="updateFilters"
     >
-        <!-- Sorter -->
-        <div class="flex gap-2 mb-4">
-            <x-forms.select 
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:flex lg:flex-row gap-3 mb-6">
+             <x-forms.select 
                 x-model="category" 
                 @change="updateFilters()"
+                class="w-full lg:w-64"
             >
                 <option value="">All Categories</option>
                 @foreach ($categories as $category)
@@ -57,26 +61,30 @@
                 </option>
                 @endforeach
             </x-forms.select>
+             
             <x-forms.select 
                 x-model="stock" 
                 @change="updateFilters()"
+                class="w-full lg:w-48"
             >
                 <option value="">All Stocks</option>
                 <option value="low">Low Stock</option>
                 <option value="medium">Medium Stock</option>
                 <option value="high">High Stock</option>
             </x-forms.select>
-            <x-forms.select x-model="order" @change="updateFilters()">
-                <option value="asc">Ascending</option>
-                <option value="desc">Descending</option>
+            
+            <x-forms.select 
+                x-model="order" 
+                @change="updateFilters()"
+                class="w-full sm:col-span-2 lg:w-48 lg:ml-auto"
+            >
+                <option value="asc">Name (A-Z)</option>
+                <option value="desc">Name (Z-A)</option>
             </x-forms.select>
         </div>
 
         <x-section>
-
             <livewire:product-order-list :products="$products" />
-            
         </x-section>
     </div>
 </x-main>
-

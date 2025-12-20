@@ -85,8 +85,8 @@ class SalesList extends Component
             ->count();
 
         $averageOrder = Order::whereBetween('created_at', [$this->startDate, $this->endDate])
-            ->whereNotNull('amount_paid')
-            ->avg('amount_paid');
+            ->whereNotNull('total_amount')
+            ->avg('total_amount');
 
         $top_payment_method = Order::selectRaw('payment_method, COUNT(*) as method_count')
             ->whereBetween('created_at', [$this->startDate, $this->endDate])

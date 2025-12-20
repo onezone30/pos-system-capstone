@@ -18,7 +18,7 @@ class UserController extends Controller
 
     public function index()
     {
-        $users = User::whereIn('role', ['admin', 'cashier'])->get();
+        $users = User::whereIn('role', ['admin', 'cashier', 'owner'])->with('orders')->get();
 
         return view(Auth::user()->role . '.users.index', [
             'users' => $users,

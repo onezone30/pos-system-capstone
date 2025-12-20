@@ -9,46 +9,46 @@ $menu = [
         'roles' => ['admin', 'owner', 'cashier'],
     ],
     [
-        'route' => 'products',
-        'label' => 'Products',
-        'icon'  => 'ph ph-bag',
-        'roles' => ['admin'],
-    ],
-    [
-        'route' => 'categories',
-        'label' => 'Categories',
-        'icon'  => 'ph ph-browsers',
-        'roles' => ['admin'],
-    ],
-    [
-        'route' => 'users',
-        'label' => 'Users',
-        'icon'  => 'ph ph-user',
-        'roles' => ['admin'],
-    ],
-    [
         'route' => 'orders.create',
         'label' => 'Create Order',
-        'icon'  => 'ph ph-list',
+        'icon'  => 'ph ph-list-plus',
         'roles' => ['admin', 'cashier'],
     ],
     [
         'route' => 'orders',
-        'label' => 'Orders',
+        'label' => 'Orders List', 
         'icon'  => 'ph ph-clipboard-text',
         'roles' => ['admin', 'owner', 'cashier'],
     ],
     [
         'route' => 'sales',
-        'label' => 'Sales',
-        'icon'  => 'ph ph-cash-register',
+        'label' => 'Sales Reports',
+        'icon'  => 'ph ph-chart-bar',
         'roles' => ['admin', 'owner'],
     ],
     [
         'route' => 'inventory',
         'label' => 'Inventory',
-        'icon'  => 'ph ph-cash-register',
+        'icon'  => 'ph ph-truck',
         'roles' => ['admin', 'owner'],
+    ],
+    [
+        'route' => 'products',
+        'label' => 'Products',
+        'icon'  => 'ph ph-tag',
+        'roles' => ['admin'],
+    ],
+    [
+        'route' => 'categories',
+        'label' => 'Categories',
+        'icon'  => 'ph ph-grid-four',
+        'roles' => ['admin'],
+    ],
+    [
+        'route' => 'users',
+        'label' => 'User Management',
+        'icon'  => 'ph ph-users-three',
+        'roles' => ['admin'],
     ],
 ];
 @endphp
@@ -70,7 +70,7 @@ $menu = [
                             010 1.5H2.75A.75.75 0 012 10z"></path>
                     </svg>
                 </button>
-                <a href="#" class="flex ms-2 md:me-24">
+                <a href="{{ route($user->role . '.dashboard') ?? '#' }}" class="flex ms-2 md:me-24">
                     <span class="self-center text-xl font-semibold sm:text-2xl whitespace-nowrap dark:text-white">Soshie Buh</span>
                 </a>
             </div>
@@ -78,16 +78,16 @@ $menu = [
             <div class="flex items-center">
                 <div class="flex items-center space-x-3">
                     @if($user->profile_image == null)
-                        <img class="w-10 h-10 rounded-full" alt="Profile Pic"
+                        <img class="w-10 h-10 rounded-full object-cover" alt="Profile Pic"
                             src="{{ asset('storage/images/profiles/default.jpg') }}">
                     @else
-                        <img class="w-10 h-10 rounded-full" alt="Profile Pic"
+                        <img class="w-10 h-10 rounded-full object-cover" alt="Profile Pic"
                             src="{{ asset('storage/' . $user->profile_image) }}">
                     @endif
 
                     <div class="flex flex-col leading-tight text-gray-700 dark:text-gray-400">
-                        <span class="font-semibold">{{ $user->name ?? 'Name' }}</span>
-                        <span class="text-sm">{{ $user->email ?? 'Email' }}</span>
+                        <span class="font-semibold text-sm">{{ $user->name ?? 'Name' }}</span>
+                        <span class="text-xs">{{ $user->email ?? 'Email' }}</span>
                     </div>
                 </div>
             </div>
@@ -96,10 +96,10 @@ $menu = [
 </nav>
 
 <aside id="logo-sidebar"
-    class="fixed top-0 left-0 z-40 w-52 h-screen pt-20 transition-transform -translate-x-full bg-white 
+    class="fixed top-0 left-0 z-40 w-52 h-screen pt-16 transition-transform -translate-x-full bg-white 
     border-r border-gray-200 sm:translate-x-0 dark:bg-gray-800 dark:border-gray-700" aria-label="Sidebar">
-    <div class="h-full px-3 pb-4 overflow-y-auto bg-white dark:bg-gray-800 flex flex-col justify-between">
-        <ul class="space-y-2 font-medium">
+    <div class="h-full pb-4 overflow-y-auto bg-white dark:bg-gray-800 flex flex-col justify-between">
+        <ul class="mt-3 space-y-2 font-medium">
             @foreach ($menu as $item)
                 @if(in_array($user->role, $item['roles']))
                     <li>
@@ -115,12 +115,6 @@ $menu = [
         </ul>
 
         <ul class="space-y-2 font-medium border-t border-gray-200 dark:border-gray-700 pt-4">
-            <!-- <li>
-                <x-sidebar-link href="{{ route('profile', $user->id) }}">
-                    <x-slot:icon><i class="ph ph-user-circle"></i></x-slot:icon>
-                    Profile
-                </x-sidebar-link>
-            </li> -->
             <li>
                 <x-sidebar-link href="{{ route('logout') }}">
                     <x-slot:icon><i class="ph ph-sign-out"></i></x-slot:icon>

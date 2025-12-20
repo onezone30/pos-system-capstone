@@ -6,7 +6,7 @@
 
         <div class="p-6 bg-gray-800 rounded-lg">
 
-            <p class="text-gray-300 text-center mb-6">
+            <p class="text-gray-300 text-center mb-6" x-data="{ sending: false }">
                 Forgot your password? Don’t worry — it happens to the best of us. 
                 Just enter the email address linked to your account, and we’ll send you 
                 a secure link to reset your password. Follow the instructions in the email, 
@@ -14,7 +14,7 @@
             </p>
 
 
-            <x-forms.form method="POST" action="{{ route('forgot-password.email') }}">
+            <x-forms.form method="POST" @submit="sending = true"  action="{{ route('forgot-password.email') }}">
 
                 <x-forms.input 
                     name="email" 
@@ -24,9 +24,9 @@
                 <x-forms.divider />
 
                 <div class="text-right">
-                    <x-forms.button>
+                    <x-button type="submit" loading="sending">
                         Send Email
-                    </x-forms.button>
+                    </x-button>
                 </div>
             </x-forms.form>
                 

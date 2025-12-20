@@ -14,7 +14,7 @@
             </p>
 
 
-            <x-forms.form method="POST" action="{{ route('password.update') }}">
+            <x-forms.form method="POST" action="{{ route('password.update', ['token' => $token]) }}">
 
                 <x-forms.input 
                     type="hidden"

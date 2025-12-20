@@ -73,37 +73,57 @@
             </div>
         </div>
 
-        {{-- Recent Transactions --}}
+        {{-- Recent Transactions Card --}}
         <div class="bg-white dark:bg-gray-800 rounded-2xl p-5 border border-gray-100 dark:border-gray-700 shadow mt-6">
-            <h2 class="text-lg font-semibold text-gray-700 dark:text-gray-400 mb-2">Recent Transactions</h2>
-            <table class="min-w-full text-sm text-gray-700 dark:text-gray-400">
-                <thead>
-                    <tr class="border-b dark:border-gray-700">
-                        <th class="text-left py-2">Order ID</th>
-                        <th class="text-left py-2">User</th>
-                        <th class="text-left py-2">Customer</th>
-                        <th class="text-left py-2">Amount Paid</th>
-                        <th class="text-left py-2">Change</th>
-                        <th class="text-left py-2">Total</th>
-                        <th class="text-left py-2">Payment Method</th>
-                        <th class="text-left py-2">Date</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach ($recentTransactions as $t)
-                        <tr class="border-b dark:border-gray-700">
-                            <td>#ORD{{ $t->id }}</td>
-                            <td>{{ $t->user->name ?? 'N/A' }}</td>
-                            <td>{{ $t->customer_name ?? 'Guest' }}</td>
-                            <td>{{ $t->amount_paid }}</td>
-                            <td>{{ $t->change }}</td>
-                            <td>₱{{ number_format($t->total_amount, 2) }}</td>
-                            <td>{{ $t->payment_method }}</td>
-                            <td>{{ $t->created_at->format('M d, Y') }}</td>
+            <h2 class="text-xl font-bold text-gray-800 dark:text-gray-200 mb-4">Recent Transactions</h2>
+
+            {{-- 💡 RESPONSIVENESS FIX: Wrap the table in a div with horizontal scroll --}}
+            <div class="overflow-x-auto rounded-lg border border-gray-200 dark:border-gray-700">
+                
+                <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                    
+                    <thead class="bg-gray-50 dark:bg-gray-700">
+                        <tr>
+                            <th class="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider dark:text-gray-400">Order ID</th>
+                            <th class="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider dark:text-gray-400">User</th>
+                            <th class="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider dark:text-gray-400">Customer</th>
+                            <th class="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider dark:text-gray-400">Amount Paid</th>
+                            <th class="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider dark:text-gray-400">Change</th>
+                            <th class="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider dark:text-gray-400">Total</th>
+                            <th class="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider dark:text-gray-400">Payment Method</th>
+                            <th class="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider dark:text-gray-400">Date</th>
                         </tr>
-                    @endforeach
-                </tbody>
-            </table>
+                    </thead>
+                    
+                    <tbody class="divide-y divide-gray-200 dark:divide-gray-700 bg-white dark:bg-gray-800">
+                        @foreach ($recentTransactions as $t)
+                            <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition duration-150">
+                                <td class="px-4 py-3 whitespace-nowrap font-medium text-gray-900 dark:text-white">#ORD{{ $t->id }}</td>
+                                <td class="px-4 py-3 whitespace-nowrap">{{ $t->user->name ?? 'N/A' }}</td>
+                                <td class="px-4 py-3 whitespace-nowrap">{{ $t->customer_name ?? 'Guest' }}</td>
+                                <td class="px-4 py-3 whitespace-nowrap text-green-600 dark:text-green-400">{{ $t->amount_paid }}</td>
+                                <td class="px-4 py-3 whitespace-nowrap">{{ $t->change }}</td>
+                                <td class="px-4 py-3 whitespace-nowrap font-semibold text-gray-900 dark:text-white">₱{{ number_format($t->total_amount, 2) }}</td>
+                                <td class="px-4 py-3 whitespace-nowrap">
+                                    <span class="inline-flex px-2 text-xs font-semibold leading-5 rounded-full 
+                                        {{ $t->payment_method === 'Cash' ? 'bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-300' : 
+                                        ($t->payment_method === 'Card' ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300' : 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300') }}">
+                                        {{ $t->payment_method }}
+                                    </span>
+                                </td>
+                                <td class="px-4 py-3 whitespace-nowrap text-xs">{{ $t->created_at->format('M d, Y') }}</td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+            
+            {{-- Optional: Add a subtle link to the full transactions page --}}
+            <div class="mt-4 text-right">
+                <a href="{{ route('admin.orders') }}" class="text-sm font-medium text-indigo-600 dark:text-indigo-400 hover:text-indigo-500 transition duration-150">
+                    View All Orders &rarr;
+                </a>
+            </div>
         </div>
 
         {{-- Inventory & Stock Insights --}}
@@ -210,13 +230,7 @@
         
         let forecastLabels = @json($forecastLabels);
         let forecastData = @json($forecastData);
-        let forecastTotals = @json($forecastData); // alias used in chart
-
-        // sanity checks (open console if something looks off)
-        console.log('salesDates', salesDates);
-        console.log('salesTotals', salesTotals);
-        console.log('forecastLabels', forecastLabels);
-        console.log('forecastData', forecastData);
+        let forecastTotals = @json($forecastData);
 
         new ApexCharts(document.querySelector("#topProductsChart"), {
             chart: { type: 'bar', height: 250, foreColor: '#ffffff' },
@@ -257,11 +271,9 @@
 
 
 
-    // $forecast7 = $forecast->forecastRevenueSeries(60, 7, 0.5);
-    // $forecast30 = $forecast->forecastRevenueSeries(60, 30, 0.5);
 
-    let forecast7Dates = @json($forecast7['dates']);   // ['2025-11-23', ...]
-    let forecast7Values = @json($forecast7['values']); // [123, 145, ...]
+    let forecast7Dates = @json($forecast7['dates']);  
+    let forecast7Values = @json($forecast7['values']);
 
     let forecast30Dates = @json($forecast30['dates']);   
     let forecast30Values = @json($forecast30['values']); 
