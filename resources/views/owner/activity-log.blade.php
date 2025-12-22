@@ -1,320 +1,131 @@
 <x-main>
 
-    <x-page-title text="Dashboard" />
-
-	<x-section>
-
-    <div>
-
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <div class="bg-white dark:bg-gray-800 rounded-2xl p-5 border border-gray-100 dark:border-gray-700 shadow">
-                <h2 class="text-lg font-semibold text-gray-700 dark:text-gray-400 mb-2">7-Day Sales Forecast</h2>
-                <div id="forecast7DaysChart" class="h-64"></div>
-            </div>
-
-            <div class="bg-white dark:bg-gray-800 rounded-2xl p-5 border border-gray-100 dark:border-gray-700 shadow">
-                <h2 class="text-lg font-semibold text-gray-700 dark:text-gray-400 mb-2">30-Day Sales Forecast</h2>
-                <div id="forecast30DaysChart" class="h-64"></div>
-            </div>
-        </div>
-
-
-        <h1 class="text-2xl font-bold text-gray-700 dark:text-gray-400 mb-4">Sales & Revenue Overview</h1>
-
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <x-dashboard-card 
-                title="Today's Sales" 
-                value="₱{{ number_format($todaySales, 2) }}" 
-            />
-
-            <x-dashboard-card 
-                title="Weekly Sales" 
-                value="₱{{ number_format($weekSales, 2) }}" 
-            />
-
-            <x-dashboard-card 
-                title="Monthly Sales" 
-                value="₱{{ number_format($monthSales, 2) }}" 
-            />
-
-            <x-dashboard-card 
-                title="Forecasted Stock-Outs" 
-                value="{{ $forecastedStockOutCount }} Products" 
-                :tooltip="implode(', ', array_map(fn($i) => $i['product'], $forecastedStockOuts))"
-            />
-
-            <x-dashboard-card 
-                title="7-Day Forecast (Avg Daily)" 
-                value="{{ round(array_sum($overallForecast['values']) / 7, 1) }} Items" 
-            />
-
-            <x-dashboard-card 
-                title="Gross Revenue" 
-                value="₱{{ number_format($grossRevenue, 2) }}" 
-            />
-        </div>
-
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
-            <div class="bg-white dark:bg-gray-800 rounded-2xl p-5 border border-gray-100 dark:border-gray-700 shadow">
-                <h2 class="text-lg font-semibold text-gray-700 dark:text-gray-400 mb-2">Top 5 Selling Products</h2>
-                <div id="topProductsChart" class="h-64"></div>
-            </div>
-
-            <div class="bg-white dark:bg-gray-800 rounded-2xl p-5 border border-gray-100 dark:border-gray-700 shadow">
-                <h2 class="text-lg font-semibold text-gray-700 dark:text-gray-400 mb-2">Total Payments by Method</h2>
-                <div id="paymentMethodChart" class="h-64"></div>
-            </div>
-        </div>
-
-        <div class="bg-white dark:bg-gray-800 rounded-2xl p-5 border border-gray-100 dark:border-gray-700 shadow mt-6">
-            <h2 class="text-xl font-bold text-gray-800 dark:text-gray-200 mb-4">Recent Transactions</h2>
-
-            <div class="overflow-x-auto rounded-lg border border-gray-200 dark:border-gray-700">
-                
-                <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                    
-                    <thead class="bg-gray-50 dark:bg-gray-700">
-                        <tr>
-                            <th class="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider dark:text-gray-400">Order ID</th>
-                            <th class="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider dark:text-gray-400">User</th>
-                            <th class="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider dark:text-gray-400">Customer</th>
-                            <th class="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider dark:text-gray-400">Amount Paid</th>
-                            <th class="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider dark:text-gray-400">Change</th>
-                            <th class="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider dark:text-gray-400">Total</th>
-                            <th class="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider dark:text-gray-400">Payment Method</th>
-                            <th class="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider dark:text-gray-400">Date</th>
-                        </tr>
-                    </thead>
-                    
-                    <tbody class="divide-y divide-gray-200 dark:divide-gray-700 bg-white dark:bg-gray-800">
-                        @foreach ($recentTransactions as $t)
-                            <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition duration-150">
-                                <td class="px-4 py-3 whitespace-nowrap font-medium text-gray-900 dark:text-white">#ORD{{ $t->id }}</td>
-                                <td class="px-4 py-3 whitespace-nowrap">{{ $t->user->name ?? 'N/A' }}</td>
-                                <td class="px-4 py-3 whitespace-nowrap">{{ $t->customer_name ?? 'Guest' }}</td>
-                                <td class="px-4 py-3 whitespace-nowrap text-green-600 dark:text-green-400">{{ $t->amount_paid }}</td>
-                                <td class="px-4 py-3 whitespace-nowrap">{{ $t->change }}</td>
-                                <td class="px-4 py-3 whitespace-nowrap font-semibold text-gray-900 dark:text-white">₱{{ number_format($t->total_amount, 2) }}</td>
-                                <td class="px-4 py-3 whitespace-nowrap">
-                                    <span class="inline-flex px-2 text-xs font-semibold leading-5 rounded-full 
-                                        {{ $t->payment_method === 'Cash' ? 'bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-300' : 
-                                        ($t->payment_method === 'Card' ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300' : 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300') }}">
-                                        {{ $t->payment_method }}
-                                    </span>
-                                </td>
-                                <td class="px-4 py-3 whitespace-nowrap text-xs">{{ $t->created_at->format('M d, Y') }}</td>
-                            </tr>
-                        @endforeach
-                    </tbody>
-                </table>
+    <main class="mt-14 max-w-4xl mx-auto px-6 pb-20">
+        <div class="flex flex-col md:flex-row md:items-center justify-between mb-10 gap-4">
+            <div>
+                <h1 class="text-3xl font-bold text-white flex items-center">
+                    <i class="ph ph-clock-counter-clockwise mr-3 text-indigo-500"></i> 
+                    Activity Log
+                </h1>
+                <p class="text-gray-400 mt-1">Real-time track of sales, stock movements, and product adjustments.</p>
             </div>
             
-            <div class="mt-4 text-right">
-                <a href="{{ route('admin.orders') }}" class="text-sm font-medium text-indigo-600 dark:text-indigo-400 hover:text-indigo-500 transition duration-150">
-                    View All Orders &rarr;
-                </a>
+            <div class="flex items-center gap-2">
+                <span class="flex items-center text-xs text-gray-400">
+                    <span class="w-3 h-3 bg-green-600 rounded-full mr-1"></span> Sales
+                </span>
+                <span class="flex items-center text-xs text-gray-400">
+                    <span class="w-3 h-3 bg-blue-600 rounded-full mr-1"></span> Stock In
+                </span>
+                <span class="flex items-center text-xs text-gray-400">
+                    <span class="w-3 h-3 bg-red-600 rounded-full mr-1"></span> Stock Out
+                </span>
+                <span class="flex items-center text-xs text-gray-400">
+                    <span class="w-3 h-3 bg-purple-600 rounded-full mr-1"></span> Settings
+                </span>
             </div>
         </div>
 
-        <h1 class="text-2xl font-bold text-gray-700 dark:text-gray-400 mt-10 mb-4">Inventory & Stock Insights</h1>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div class="bg-white dark:bg-gray-800 rounded-2xl p-5 border border-gray-100 dark:border-gray-700 shadow">
-                <h2 class="text-lg font-semibold text-gray-700 dark:text-gray-400 mb-2">Low-Stock Alerts</h2>
-                <ul class="list-disc list-inside text-gray-700 dark:text-gray-400">
-                    @forelse ($lowStock as $item)
-                        <li>{{ $item->product->name }} — {{ $item->quantity_stock }} units left</li>
-                    @empty
-                        <li>No low-stock products 🎉</li>
-                    @endforelse
-                </ul>
-            </div>
+        <div class="relative">
+            <div class="absolute left-4 md:left-8 top-0 bottom-0 w-0.5 bg-gray-700"></div>
 
-            <div class="bg-white dark:bg-gray-800 rounded-2xl p-5 border border-gray-100 dark:border-gray-700 shadow">
-                <h2 class="text-lg font-semibold text-gray-700 dark:text-gray-400 mb-2">Out-of-Stock Products</h2>
-                <ul class="list-disc list-inside text-gray-700 dark:text-gray-400">
-                    @forelse ($outOfStock as $item)
-                        <li><strong>{{ $item->product->name }}</strong> ({{ $item->product->category->name }}) -- {{ $item->size }}</li>
-                    @empty
-                        <li>No out-of-stock items 🎉</li>
-                    @endforelse
-                </ul>
-            </div>
+            @forelse ($activities as $activity)
+                @php
+                    // Logic to determine appearance based on activity type
+                    $isSale = $activity->log_type === 'sale';
+                    $isSetting = $activity->log_type === 'setting';
+                    
+                    if ($isSale) {
+                        $icon = 'ph-shopping-cart';
+                        $colorClass = 'bg-green-600 ring-green-900/30';
+                        $borderClass = 'border-green-500/20';
+                    } elseif ($isSetting) {
+                        $icon = 'ph-gear-six';
+                        $colorClass = 'bg-purple-600 ring-purple-900/30';
+                        $borderClass = 'border-purple-500/20';
+                    } else {
+                        $icon = $activity->type === 'in' ? 'ph-trend-up' : 'ph-trend-down';
+                        $colorClass = $activity->type === 'in' ? 'bg-blue-600 ring-blue-900/30' : 'bg-red-600 ring-red-900/30';
+                        $borderClass = $activity->type === 'in' ? 'border-blue-500/20' : 'border-red-500/20';
+                    }
+                @endphp
+
+                <div class="relative pl-12 md:pl-20 mb-10 group">
+                    <span class="absolute -left-2 md:left-2 top-2 w-12 text-[10px] font-bold text-gray-500 uppercase vertical-text hidden md:block">
+                        {{ $activity->created_at->format('M d') }}
+                    </span>
+
+                    <div class="absolute left-1.5 md:left-5.5 top-0 w-6 h-6 md:w-8 md:h-8 rounded-full {{ $colorClass }} ring-4 flex items-center justify-center z-10 transition-transform group-hover:scale-110">
+                        <i class="ph {{ $icon }} text-white text-sm md:text-base"></i>
+                    </div>
+
+                    <div class="bg-gray-800 border {{ $borderClass }} rounded-xl p-5 shadow-xl hover:bg-gray-750 transition-colors">
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3">
+                            <span class="text-xs text-gray-500 font-mono">
+                                {{ $activity->created_at->format('h:i A') }} ({{ $activity->created_at->diffForHumans() }})
+                            </span>
+                            <span class="text-xs text-gray-400 flex items-center">
+                                <i class="ph ph-user-circle mr-1 text-base"></i>
+                                {{ $activity->user->name ?? 'System' }}
+                            </span>
+                        </div>
+
+                        @if($isSale)
+                            <div class="flex items-start justify-between">
+                                <div>
+                                    <h3 class="text-lg font-bold text-white">Order Processed</h3>
+                                    <p class="text-gray-400 text-sm mt-1">
+                                        Received <span class="text-green-400 font-bold">₱{{ number_format($activity->total_amount, 2) }}</span> 
+                                        from <span class="text-gray-200">{{ $activity->customer_name ?? 'Walk-in Customer' }}</span>
+                                    </p>
+                                </div>
+                                <span class="px-2 py-1 bg-gray-900 rounded text-[10px] font-bold text-gray-400 uppercase border border-gray-700">
+                                    {{ $activity->payment_method }}
+                                </span>
+                            </div>
+                            <div class="mt-4 flex flex-wrap gap-2">
+                                @foreach($activity->items as $item)
+                                    <span class="px-2 py-1 bg-gray-900/50 text-gray-400 text-[11px] rounded border border-gray-700">
+                                        {{ $item->quantity }}x {{ $item->product->name ?? '' }}
+                                    </span>
+                                @endforeach
+                            </div>
+
+                        @elseif($isSetting)
+                            <h3 class="text-lg font-bold text-white">Configuration Change</h3>
+                            <div class="mt-2 p-3 bg-gray-900/50 rounded-lg border border-purple-500/10">
+                                <p class="text-sm text-gray-300 italic">
+                                    "{{ $activity->note }}"
+                                </p>
+                            </div>
+                            <p class="text-xs text-gray-500 mt-2">Product: <span class="text-purple-400">{{ $activity->product->name ?? '' }}</span></p>
+
+                        @else
+                            <div class="flex items-center justify-between">
+                                <h3 class="text-lg font-bold text-white">
+                                    Stock {{ $activity->type === 'in' ? 'Replenished' : 'Removed' }}
+                                </h3>
+                                <span class="text-xl font-black {{ $activity->type === 'in' ? 'text-blue-500' : 'text-red-500' }}">
+                                    {{ $activity->type === 'in' ? '+' : '-' }}{{ $activity->quantity }}
+                                </span>
+                            </div>
+                            <p class="text-sm text-gray-400 mt-1">
+                                <span class="text-gray-200 font-medium">{{ $activity->product->name ?? '' }}</span> 
+                                stock level was adjusted.
+                            </p>
+                            @if($activity->note)
+                                <p class="text-xs text-gray-500 mt-2 italic">Note: {{ $activity->note }}</p>
+                            @endif
+                        @endif
+                    </div>
+                </div>
+            @empty
+                <div class="text-center py-20 bg-gray-800 rounded-xl border border-dashed border-gray-700">
+                    <i class="ph ph-tray text-5xl text-gray-600"></i>
+                    <p class="text-gray-500 mt-4 font-medium">No activity recorded yet.</p>
+                </div>
+            @endforelse
+
         </div>
-
-        <div class="mt-8 shadow rounded p-4">
-            <h3 class="text-lg font-semibold mb-3">Products at Risk of Stock-Out (≤ 7 Days)</h3>
-
-            <table class="w-full text-sm text-center">
-                <thead >
-                    <tr class="border-b text-center">
-                        <th class="py-2">Product</th>
-                        <th class="py-2">Size</th>
-                        <th class="py-2">Stock</th>
-                        <th class="py-2">Days Left</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @forelse($forecastedStockOuts as $item)
-                        <tr class="border-b">
-                            <td class="py-2">{{ $item['product'] }}</td>
-                            <td class="py-2">{{ $item['size'] }}</td>
-                            <td class="py-2">{{ $item['stock'] }}</td>
-                            <td class="py-2 font-semibold text-red-600">{{ $item['days_left'] }}</td>
-                        </tr>
-                    @empty
-                        <tr>
-                            <td colspan="4" class="py-3 text-center text-gray-500">
-                                No predicted stock-outs.
-                            </td>
-                        </tr>
-                    @endforelse
-                </tbody>
-            </table>
-        </div>
-
-        <div class="bg-white dark:bg-gray-800 rounded-2xl p-5 border border-gray-100 dark:border-gray-700 shadow mt-6">
-            <h3 class="text-lg font-semibold mb-3">Sales Trend (Actual + Forecast)</h3>
-            <div id="salesTrendsChart"></div>
-        </div>
-
-        <h1 class="text-2xl font-bold text-gray-700 dark:text-gray-400 mt-10 mb-4">Employee / User Overview</h1>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <x-dashboard-card title="Active Cashiers on Duty" value="{{ $employeeSales->count() }}" />
-
-            <x-dashboard-card 
-                title="Top Seller (Employee)" 
-                value="{{ $topSeller->name ?? 'N/A' }} – ₱{{ number_format($topSeller->total_sales ?? 0, 2) }}" 
-            />
-        </div>
-
-        <div class="bg-white dark:bg-gray-800 rounded-2xl p-5 border border-gray-100 dark:border-gray-700 shadow mt-6">
-            <h2 class="text-lg font-semibold text-gray-700 dark:text-gray-400 mb-2">Sales by Employee (Leaderboard)</h2>
-            <div id="salesByEmployeeChart" class="h-64"></div>
-        </div>
-
-    </div>
-
-	</x-section>
-
+    </main>
 </x-main>
-
-<script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
-<script>
-	document.addEventListener("DOMContentLoaded", function () {
-
-        let topProductNames = @json($topProducts->pluck('product.name'));
-        let topProductTotals = @json($topProducts->pluck('total'));
-
-        let paymentLabels = @json($paymentMethods->pluck('payment_method'));
-        let paymentSeries = @json($paymentMethods->pluck('total'));
-
-        let salesDates = @json($chartDates);
-        let salesTotals = @json($chartTotals);
-
-        let employeeNames = @json($employeeNames);
-        let employeeTotals = @json($employeeTotals);
-        
-        let forecastLabels = @json($forecastLabels);
-        let forecastData = @json($forecastData);
-        let forecastTotals = @json($forecastData);
-
-        new ApexCharts(document.querySelector("#topProductsChart"), {
-            chart: { type: 'bar', height: 250, foreColor: '#ffffff' },
-            series: [{ name: 'Sales', data: topProductTotals }],
-            xaxis: { categories: topProductNames }
-        }).render();
-
-        new ApexCharts(document.querySelector("#paymentMethodChart"), {
-            chart: { type: 'donut', height: 250, foreColor: '#ffffff' },
-            series: paymentSeries,
-            tooltip: { theme: 'dark' },
-            labels: paymentLabels
-        }).render();
-
-
-        new ApexCharts(document.querySelector("#salesTrendsChart"), {
-            chart: { type: 'line', height: 250, foreColor: '#ffffff' },
-            series: [
-                { name: 'Actual Sales', data: salesTotals },
-                { name: 'Forecast', data: forecastTotals }
-            ],
-            xaxis: { categories: salesDates },
-            yaxis: { labels: { formatter: val => `₱${val}` } },
-            tooltip: { theme: 'dark' },
-            stroke: { width: 2, curve: 'smooth' },
-            markers: { size: 4 }
-        }).render();
-
-
-        new ApexCharts(document.querySelector("#salesByEmployeeChart"), {
-            chart: { type: 'bar', height: 250, foreColor: '#ffffff' },
-            series: [{ name: 'Sales', data: employeeTotals }],
-            xaxis: { categories: employeeNames },
-            yaxis: { labels: { formatter: val => `₱${val}` } }
-        }).render();
-	});
-
-
-
-
-    let forecast7Dates = @json($forecast7['dates']);  
-    let forecast7Values = @json($forecast7['values']);
-
-    let forecast30Dates = @json($forecast30['dates']);   
-    let forecast30Values = @json($forecast30['values']); 
-
-    let options7 = {
-        series: [{
-            name: "Predicted Sales",
-            data: forecast7Values
-        }],
-        chart: {
-            type: 'area',
-            height: 300,
-            zoom: { enabled: false },
-            foreColor: '#ffffff',
-        },
-        dataLabels: { enabled: false },
-        title: {
-            text: 'Predicted Daily Sales',
-            align: 'left'
-        },
-        labels: forecast7Dates,
-        xaxis: { type: 'datetime' },
-        yaxis: { opposite: false },
-        legend: { horizontalAlign: 'left' },
-        tooltip: { theme: 'dark' },
-        stroke: { width: 2, curve: 'smooth' },
-        markers: { size: 4 }
-    };
-    new ApexCharts(document.querySelector("#forecast7DaysChart"), options7).render();
-
-    let options30 = {
-        series: [{
-            name: "Predicted Sales",
-            data: forecast30Values
-        }],
-        chart: {
-            type: 'area',
-            height: 300,
-            zoom: { enabled: false },
-            foreColor: '#ffffff',
-        },
-        dataLabels: { enabled: false },
-        title: {
-            text: 'Predicted Daily Sales',
-            align: 'left'
-        },
-        labels: forecast30Dates,
-        xaxis: { type: 'datetime' },
-        yaxis: { opposite: false },
-        legend: { horizontalAlign: 'left' },
-        tooltip: { theme: 'dark' },
-        stroke: { width: 2, curve: 'smooth' },
-        markers: { size: 4 }
-    };
-    new ApexCharts(document.querySelector("#forecast30DaysChart"), options30).render();
-
-
-
-</script>

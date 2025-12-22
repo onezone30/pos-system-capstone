@@ -122,10 +122,15 @@ $menu = [
 
         <ul class="space-y-2 font-medium border-t border-gray-200 dark:border-gray-700 pt-4">
             <li>
-                <x-sidebar-link href="{{ route('logout') }}">
-                    <x-slot:icon><i class="ph ph-sign-out"></i></x-slot:icon>
-                    Logout
-                </x-sidebar-link>
+                <form action="{{ route('logout') }}" method="POST">
+                    @csrf
+                    <button type="submit" class="w-full text-left">
+                        <x-sidebar-link href="#" onclick="event.preventDefault(); this.closest('form').submit();">
+                            <x-slot:icon><i class="ph ph-sign-out"></i></x-slot:icon>
+                            Logout
+                        </x-sidebar-link>
+                    </button>
+                </form>
             </li>
         </ul>
     </div>

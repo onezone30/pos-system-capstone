@@ -4,13 +4,12 @@ use App\Http\Controllers\ActivityLogController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\CashierController;
 use App\Http\Controllers\CategoryController;
-use App\Http\Controllers\ownerController;
+use App\Http\Controllers\OwnerController;
 use App\Http\Controllers\auth\ForgotPasswordController;
 use App\Http\Controllers\auth\LoginController;
 use App\Http\Controllers\auth\PasswordController;
 use App\Http\Controllers\InventoryController;
 use App\Http\Controllers\OrderController;
-use App\Http\Controllers\OwnerController as ControllersOwnerController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SalesController;
@@ -49,7 +48,7 @@ Route::middleware(['guest'])->group(function() {
 
 });
 
-Route::get('/logout', [LoginController::class, 'destroy'])
+Route::post('/logout', [LoginController::class, 'destroy'])
         ->name('logout')
         ->middleware('auth');
         
