@@ -44,18 +44,16 @@ class EditOrderForm extends Component
 
         $this->items = $this->order->items
             ->map(function ($item) {
-                $product = $item->product;
-
                 return [
-                    'id' => $item->id,
-                    'name' => $product?->name ?? 'Unknown Product',
-                    'price' => $item->price,
-                    'subtotal' => $item->subtotal,
-                    'quantity' => $item->quantity,
+                    'id'         => $item->id,
+                    'product_id' => $item->product_id,
+                    'name'       => $item->product?->name ?? 'Unknown Product',
+                    'price'      => $item->price,
+                    'subtotal'   => $item->subtotal,
+                    'quantity'   => $item->quantity,
                 ];
             })
             ->toArray();
-
 
         $this->calculateTotal();
     }
@@ -113,15 +111,16 @@ class EditOrderForm extends Component
         $this->validate();
 
         $data = [
+            'customer_name'  => $this->customer_name,
             'payment_method' => $this->payment_method,
-            'total' => $this->total,
-            'amount_paid' => $this->amount_paid,
-            'items' => $this->items,
+            'total'          => $this->total,
+            'amount_paid'    => $this->amount_paid,
+            'items'          => $this->items,
         ];
 
         $service->update($this->order, $data);
 
-        $this->dispatch('toast.success', message: "Order No.{$this->order->id} has been updated");
+        $this->dispatch('toast.success', message: "Order No.{$this->order->id} and Inventory updated");
         $this->dispatch('editOrder');
         $this->dispatch('close-edit-modal');
     }

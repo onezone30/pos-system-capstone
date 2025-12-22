@@ -3,6 +3,8 @@
 namespace App\Livewire\Category;
 
 use App\Models\Category;
+use App\Models\InventoryLogs;
+use App\Services\CategoryServices;
 use Livewire\Component;
 
 class CategoryList extends Component
@@ -44,12 +46,14 @@ class CategoryList extends Component
         return $categories;
     }
 
-    public function delete(int $id)
+    public function delete(int $id, CategoryServices $services)
     {
         $category = Category::findOrFail($id);
+
+        $services->delete($category);
         
         if(! $category->delete()) {
-            $this->dispatch('toast.success', message: "{$category->name}");
+            $this->dispatch('toast.error', message: "{$category->name}");
         }
 
         $this->dispatch('deleteCategory');

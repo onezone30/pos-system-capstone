@@ -33,7 +33,7 @@ class CreateCategoryForm extends Component
         $this->dispatch('close-create-modal');
         $this->dispatch('createCategory');
         $this->dispatch('toast.success', message: "{$this->name} category has been created");
-        $this->reset();
+        $this->reset(['name', 'description']); 
     }
 
     public function render()

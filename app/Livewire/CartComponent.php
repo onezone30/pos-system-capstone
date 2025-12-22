@@ -147,6 +147,7 @@ class CartComponent extends Component
 
                 InventoryLogs::create([
                     'product_id' => $item->product_id,
+                    'user_id' => auth()->id(),
                     'type' => 'out',
                     'quantity' => $item->quantity,
                     'note' => "Order #{$order->id} by " . auth()->user()->name . " - {$item->product->name} (size: {$item->price->size})",

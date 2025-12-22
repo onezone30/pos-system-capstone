@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Order;
 
+use App\Models\InventoryLogs;
 use App\Models\Order;
 use Livewire\Attributes\On;
 use Livewire\Component;
@@ -42,6 +43,24 @@ class OrderList extends Component
     {
         $this->user = $userId;
         $this->resetPage();
+    }
+
+    #[On('delete')] 
+    public function delete($id)
+    {
+        $order = Order::findOrFail($id);
+        
+        InventoryLogs::create([
+            'product_id' => null, 
+            'user_id' => auth()->id(),
+            'type' => 'adjustment',
+            'quantity' => 0,
+            'note' => "Order #{$order->id} (Customer: {$order->customer_name}) was deleted by " . auth()->user()->name
+        ]);
+
+        $order->delete();
+
+        $this->dispatch('toast.success', 'Order deleted successfully');
     }
 
     private function setDateRange($range)

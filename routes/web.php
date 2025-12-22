@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ActivityLogController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\CashierController;
 use App\Http\Controllers\CategoryController;
@@ -9,6 +10,7 @@ use App\Http\Controllers\auth\LoginController;
 use App\Http\Controllers\auth\PasswordController;
 use App\Http\Controllers\InventoryController;
 use App\Http\Controllers\OrderController;
+use App\Http\Controllers\OwnerController as ControllersOwnerController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SalesController;
@@ -63,6 +65,9 @@ Route::middleware(['auth', 'role:owner'])->prefix('owner')->name('owner.')->grou
     Route::get('/dashboard', [OwnerController::class, 'dashboard'])
         ->name('dashboard');
 
+    Route::get('/activity-log', [OwnerController::class, 'activityLog'])
+        ->name('activity-log');
+
     Route::get('/orders', [OrderController::class, 'index'])
         ->name('orders');
     Route::get('/orders/create', [OrderController::class, 'create'])
@@ -80,6 +85,9 @@ Route::middleware(['auth', 'role:owner'])->prefix('owner')->name('owner.')->grou
 Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function() {
     Route::get('/dashboard', [AdminController::class, 'dashboard'])
         ->name('dashboard');
+
+    Route::get('/activity-log', [AdminController::class, 'activityLog'])
+        ->name('activity-log');
 
     // products
     Route::get('/products', [ProductController::class, 'index'])

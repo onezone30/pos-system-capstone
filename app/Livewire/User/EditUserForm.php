@@ -20,8 +20,8 @@ class EditUserForm extends Component
     public string $email;
     public string $role;
     public $profile_image;
-    public string $password;
-    public string $password_confirmation;
+    public string $password = '';
+    public string $password_confirmation = '';
 
     public function rules()
     {

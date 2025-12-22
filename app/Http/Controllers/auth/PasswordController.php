@@ -27,22 +27,24 @@ class PasswordController extends Controller
             'password' => 'confirmed|required|min:8',
         ]);
 
-        $status = Password::reset(
-            $request->only('email', 'token', 'password', 'password_confirmation'), 
-            function(User $user, string $password) {
-                $user->forceFill([
-                    'password' => Hash::make($password)
-                ])->setRememberToken(Str::random(60));
+        try {
+            Password::reset(
+                $request->only('email', 'token', 'password', 'password_confirmation'), 
+                function(User $user, string $password) {
+                    $user->forceFill([
+                        'password' => Hash::make($password)
+                    ])->setRememberToken(Str::random(60));
 
-                $user->save();
-            }
-        );
+                    $user->save();
+                }
+            );
 
-        return redirect()->route('login')->with('toast', [
-            'type' => 'success',
-            'message' => 'Password reset successfully'
-        ]);
-
-
+            return redirect()->route('login')->with('toast', [
+                'type' => 'success',
+                'message' => 'Password reset successfully'
+            ]);
+        } catch (\Exception $e) {
+            return back()->withErrors(['email' => 'Failed to reset password. Please try again.']);
+        }
     }
 }

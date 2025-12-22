@@ -50,6 +50,12 @@ $menu = [
         'icon'  => 'ph ph-users-three',
         'roles' => ['admin'],
     ],
+    [
+        'route' => 'activity-log',
+        'label' => 'Activity Log',
+        'icon'  => 'ph ph-clock-afternoon',
+        'roles' => ['admin', 'owner'],
+    ]
 ];
 @endphp
 

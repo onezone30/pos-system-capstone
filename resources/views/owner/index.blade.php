@@ -170,7 +170,7 @@
 
             <x-dashboard-card 
                 title="Top Seller (Employee)" 
-                value="{{ $topSeller->name }} – ₱{{ number_format($topSeller->total_sales, 2) }}" 
+                value="{{ $topSeller->name ?? '' }} – ₱{{ number_format($topSeller->total_sales ?? 0, 2) }}" 
             />
         </div>
 

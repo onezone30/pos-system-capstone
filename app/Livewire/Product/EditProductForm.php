@@ -4,7 +4,6 @@ namespace App\Livewire\Product;
 
 use App\Models\Category;
 use App\Models\Product;
-use App\Models\ProductPrices;
 use App\Services\ProductServices;
 use Illuminate\Support\Facades\Storage;
 use Livewire\Attributes\On;
@@ -16,52 +15,37 @@ class EditProductForm extends Component
     use WithFileUploads;
 
     public Product $product;
-
-    public string $name;
-    public int $category_id;
+    public $name;
+    public $category_id;
     public $product_image;
-
-    public array $sizes = ['small', 'medium', 'large'];
+    
+    // Parallel arrays for dynamic sizes
+    public array $sizes = [];
     public array $prices = [];
     public array $quantities = [];
     public array $reorder_levels = [];
 
-    public function rules()
+    protected function rules()
     {
-        $rules = [
-            'name'          => 'required|string|max:255',
-            'category_id'   => 'required|exists:categories,id',
-            'sizes'         => 'array|min:1',
-            'sizes.*'       => 'required|string|max:255',
-            'prices'        => 'array',
-            'quantities'    => 'array',
-            'reorder_levels'    => 'array',
-            'prices.*'      => 'nullable|numeric|min:0|max:999999.99',
-            'quantities.*'  => 'nullable|integer|min:0',
-            'reorder_levels.*'  => 'nullable|integer|min:0',
+        return [
+            'name' => 'required|string|max:255',
+            'category_id' => 'required|exists:categories,id',
+            'sizes.*' => 'required|string|max:50',
+            'prices.*' => 'required|numeric|min:0',
+            'quantities.*' => 'required|integer|min:0',
+            'reorder_levels.*' => 'required|integer|min:0',
+            'product_image' => 'nullable|image|max:2048',
         ];
-
-        if ($this->product_image instanceof \Livewire\Features\SupportFileUploads\TemporaryUploadedFile) {
-            $rules['product_image'] = 'nullable|image|max:2048|mimes:jpg,jpeg,png,webp';
-        }
-
-        return $rules;
     }
 
     #[On('open-edit-modal')]
     public function load($id)
     {
-        
         $this->product = Product::with('prices')->findOrFail($id);
         $this->name = $this->product->name;
         $this->category_id = $this->product->category_id;
-        $this->product_image = $this->product->product_image;
-
-        // Load all existing sizes dynamically
-        $this->sizes = [];
-        $this->prices = [];
-        $this->quantities = [];
-        $this->reorder_levels = [];
+        
+        $this->sizes = []; $this->prices = []; $this->quantities = []; $this->reorder_levels = [];
 
         foreach ($this->product->prices as $price) {
             $this->sizes[] = $price->size;
@@ -70,62 +54,53 @@ class EditProductForm extends Component
             $this->reorder_levels[] = $price->reorder_level;
         }
     }
+
     public function addSize()
     {
         $this->sizes[] = '';
-        $this->prices[] = '';
-        $this->quantities[] = '';
-        $this->reorder_levels[] = '';
-    }
-
-    public function removeProductImage()
-    {
-        if($this->product->product_image) {
-            Storage::delete('public/' . $this->product->product_image);
-        }
-
-        $this->product_image = null;
-        $this->dispatch('toast.success', message: 'Product image removed');
+        $this->prices[] = 0;
+        $this->quantities[] = 0;
+        $this->reorder_levels[] = 5; 
     }
 
     public function removeSize($index)
     {
-        unset($this->sizes[$index]);
+        unset($this->sizes[$index], $this->prices[$index], $this->quantities[$index], $this->reorder_levels[$index]);
         $this->sizes = array_values($this->sizes);
+        $this->prices = array_values($this->prices);
+        $this->quantities = array_values($this->quantities);
+        $this->reorder_levels = array_values($this->reorder_levels);
     }
 
     public function update(ProductServices $service)
     {
-        $validated = $this->validate();
+        $this->validate();
 
         $data = [
-            'name'          => $validated['name'],
-            'category_id'   => $validated['category_id'],
+            'name' => $this->name,
+            'category_id' => $this->category_id,
             'product_image' => $this->product_image,
             'prices' => collect($this->sizes)->map(function ($size, $index) {
                 return [
-                    'size'           => $size,
-                    'quantity_stock' => $this->quantities[$index] === '' ? null : $this->quantities[$index],
-                    'price'          => $this->prices[$index] === '' ? null : $this->prices[$index],
-                    'reorder_level' => $this->reorder_levels[$index] === '' ? null : $this->reorder_levels[$index],
+                    'size' => $size,
+                    'price' => $this->prices[$index],
+                    'quantity_stock' => $this->quantities[$index],
+                    'reorder_level' => $this->reorder_levels[$index],
                 ];
             })->toArray(),
         ];
 
         $service->update($this->product, $data);
 
-        $this->dispatch('toast.success', message: "{$data['name']} has been updated");
-        $this->dispatch('editProduct');
+        $this->dispatch('toast.success', 'Product and Inventory updated');
         $this->dispatch('close-edit-modal');
+        $this->dispatch('editProduct'); 
     }
-
 
     public function render()
     {
-        $categories = Category::all();
-
         return view('livewire.product.edit-product-form', [
-            'categories' => $categories,
+            'categories' => Category::all()
         ]);
     }
 }

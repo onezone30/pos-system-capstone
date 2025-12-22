@@ -42,10 +42,11 @@ class EditCategoryForm extends Component
 
         if(!$services->update($this->category, $categoryData)) {
             $this->dispatch('toast.error', message: 'Error updating category');
+            return;
         }
 
         $this->dispatch('editCategory');
-        $this->dispatch('toast.success', message: "{$this->name} category has been create");
+        $this->dispatch('toast.success', message: "{$this->name} category has been updated");
         $this->dispatch('close-edit-modal');
     }
 
