@@ -9,7 +9,7 @@ use Livewire\Component;
 class CreateCategoryForm extends Component
 {
     public string $name;
-    public string $description;
+    public string $description = '';
 
     public function rules()
     {
